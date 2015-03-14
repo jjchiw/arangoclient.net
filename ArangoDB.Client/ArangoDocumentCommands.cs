@@ -37,7 +37,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> SaveAsync<T>(object document, bool? createCollection = null, bool? waitForSync = null)
         {
-            return await Collection<T>().SaveAsync(document, createCollection, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().SaveAsync(document, createCollection, waitForSync, BeforeItemSaved).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public DocumentIdentifierResult Save<T>(object document, bool? createCollection = null, bool? waitForSync = null)
         {
-            return Collection<T>().Save(document, createCollection, waitForSync);
+            return Collection<T>().Save(document, createCollection, waitForSync, BeforeItemSaved);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public DocumentIdentifierResult SaveEdge<T>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null)
         {
-            return EdgeCollection<T>().SaveEdge(from, to, edgeDocument, createCollection, waitForSync);
+            return EdgeCollection<T>().SaveEdge(from, to, edgeDocument, createCollection, waitForSync, BeforeItemSaved);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> SaveEdgeAsync<T>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null)
         {
-            return await EdgeCollection<T>().SaveEdgeAsync(from, to, edgeDocument, createCollection, waitForSync).ConfigureAwait(false);
+            return await EdgeCollection<T>().SaveEdgeAsync(from, to, edgeDocument, createCollection, waitForSync, BeforeItemSaved).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace ArangoDB.Client
         ///<returns>Document identifiers</returns>
         public DocumentIdentifierResult UpdateById<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return Collection<T>().UpdateById(id, document, keepNull, mergeObjects, rev, policy, waitForSync);
+            return Collection<T>().UpdateById(id, document, keepNull, mergeObjects, rev, policy, waitForSync, BeforeItemUpdated);
         }
 
         ///<summary>
@@ -186,7 +186,7 @@ namespace ArangoDB.Client
         ///<returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> UpdateByIdAsync<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return await Collection<T>().UpdateByIdAsync(id, document,keepNull,mergeObjects, rev, policy, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().UpdateByIdAsync(id, document, keepNull, mergeObjects, rev, policy, waitForSync, BeforeItemUpdated).ConfigureAwait(false);
         }
 
         ///<summary>
@@ -200,7 +200,7 @@ namespace ArangoDB.Client
         ///<returns>Document identifiers</returns>
         public DocumentIdentifierResult Update<T>(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return Collection<T>().Update(document, keepNull, mergeObjects, policy, waitForSync);
+            return Collection<T>().Update(document, keepNull, mergeObjects, policy, waitForSync, BeforeItemUpdated);
         }
 
         ///<summary>
@@ -214,7 +214,7 @@ namespace ArangoDB.Client
         ///<returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> UpdateAsync<T>(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return await Collection<T>().UpdateAsync(document, keepNull, mergeObjects, policy, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().UpdateAsync(document, keepNull, mergeObjects, policy, waitForSync, BeforeItemUpdated).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace ArangoDB.Client
         /// <returns></returns>
         public DocumentIdentifierResult Remove<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return Collection<T>().Remove(document, policy, waitForSync);
+            return Collection<T>().Remove(document, policy, waitForSync, BeforeItemRemoved);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace ArangoDB.Client
         /// <returns></returns>
         public async Task<DocumentIdentifierResult> RemoveAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return await Collection<T>().RemoveAsync(document, policy, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().RemoveAsync(document, policy, waitForSync, BeforeItemRemoved).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace ArangoDB.Client
         /// <returns></returns>
         public DocumentIdentifierResult RemoveById<T>(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return Collection<T>().RemoveById(id, rev, policy, waitForSync);
+            return Collection<T>().RemoveById(id, rev, policy, waitForSync, BeforeItemRemoved);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace ArangoDB.Client
         /// <returns></returns>
         public async Task<DocumentIdentifierResult> RemoveByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return await Collection<T>().RemoveByIdAsync(id, rev, policy, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().RemoveByIdAsync(id, rev, policy, waitForSync, BeforeItemRemoved).ConfigureAwait(false);
         }
 
         /// <summary>

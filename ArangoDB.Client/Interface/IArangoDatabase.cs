@@ -381,6 +381,11 @@ namespace ArangoDB.Client
         /// <returns>CreateCollectionResult</returns>
         Task<CreateCollectionResult> CreateCollectionAsync(string name, bool? waitForSync = null, bool? doCompact = null, decimal? journalSize = null,
             bool? isSystem = null, bool? isVolatile = null, CollectionType? type = null, int? numberOfShards = null, string shardKeys = null);
+
+        event EventHandler<ArangoDatabaseEventArgs> BeforeItemRemoved;
+        event EventHandler<ArangoDatabaseEventArgs> BeforeItemSaved;
+        event EventHandler<ArangoDatabaseEventArgs> BeforeItemUpdated;
+        event EventHandler<ArangoDatabaseEventArgs> BeforeItemReplaced;
         
     }
 }
