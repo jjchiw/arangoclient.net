@@ -381,6 +381,18 @@ namespace ArangoDB.Client
         /// <returns>CreateCollectionResult</returns>
         Task<CreateCollectionResult> CreateCollectionAsync(string name, bool? waitForSync = null, bool? doCompact = null, decimal? journalSize = null,
             bool? isSystem = null, bool? isVolatile = null, CollectionType? type = null, int? numberOfShards = null, string shardKeys = null);
+
+        /// <summary>
+        /// List of collections name
+        /// </summary>
+        /// <returns>List of collections names</returns>
+        List<CollectionData> ListCollections();
+
+        /// <summary>
+        /// List of collections name
+        /// </summary>
+        /// <returns>List of collections names</returns>
+        Task<List<CollectionData>> ListCollectionsAsync();
         
     }
 }
