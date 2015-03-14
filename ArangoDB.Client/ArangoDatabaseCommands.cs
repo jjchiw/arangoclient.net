@@ -225,5 +225,32 @@ namespace ArangoDB.Client
 
             var result = await command.RequestGenericSingleResult<bool, InheritedCommandResult<bool>>().ConfigureAwait(false);
         }
+
+        /// List of collections name
+        /// </summary>
+        /// <returns>List of collections names</returns>
+        public List<CollectionData> ListCollections()
+        {
+            return ListCollectionsAsync().ResultSynchronizer();
+        }
+
+        /// <summary>
+        /// List of collections name
+        /// </summary>
+        /// <returns>List of collections names</returns>
+        public async Task<List<CollectionData>> ListCollectionsAsync()
+        {
+            var command = new HttpCommand(this)
+            {
+                Api = CommandApi.Collection,
+                Method = HttpMethod.Get,
+                Command = "",
+                IsSystemCommand = false
+            };
+
+            var result = await command.RequestMergedResult<ListCollectionDataResult>().ConfigureAwait(false);
+
+            return result.Result.Collections.ToList();
+        }
     }
 }

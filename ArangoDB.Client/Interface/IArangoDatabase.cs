@@ -383,15 +383,18 @@ namespace ArangoDB.Client
             bool? isSystem = null, bool? isVolatile = null, CollectionType? type = null, int? numberOfShards = null, string shardKeys = null);
 
         /// <summary>
-        /// Deletes a database
+        /// List of collections name
         /// </summary>
-        /// <param name="name">Name of the database</param>
-        /// <returns></returns>
-        void DeleteDatabase(string name);
+        /// <returns>List of collections names</returns>
+        List<CollectionData> ListCollections();
 
         /// <summary>
-        /// Creates a database
+        /// List of collections name
         /// </summary>
+        /// <returns>List of collections names</returns>
+        Task<List<CollectionData>> ListCollectionsAsync();
+        
+        
         /// <param name="name">Name of the database</param>
         /// <param name="users">list of database user</param>
         /// <returns></returns>
