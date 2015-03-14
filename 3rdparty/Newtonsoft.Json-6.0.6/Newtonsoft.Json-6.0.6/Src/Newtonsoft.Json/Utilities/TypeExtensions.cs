@@ -427,7 +427,7 @@ namespace ArangoDB.Client.Common.Newtonsoft.Json.Utilities
 
         public static PropertyInfo GetProperty(this Type type, string name, BindingFlags bindingFlags)
         {
-            return type.GetTypeInfo().GetDeclaredProperty(name);
+            return type.GetTypeInfo().GetPropertiesRecursive().FirstOrDefault(x => x.Name == name);
         }
 
         public static IEnumerable<FieldInfo> GetFields(this Type type)
