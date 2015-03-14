@@ -44,6 +44,7 @@
     <Compile Include="ArangoCollection.cs" />
     <Compile Include="ArangoDatabase.cs" />
     <Compile Include="ArangoDatabaseCommands.cs" />
+    <Compile Include="ArangoDatabaseEventArgs.cs" />
     <Compile Include="ArangoDocumentCommands.cs" />
     <Compile Include="ArangoServerException.cs" />
     <Compile Include="BaseResultAnalyzer.cs" />
