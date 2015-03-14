@@ -112,7 +112,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public DocumentIdentifierResult Replace<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return Collection<T>().Replace(document, policy, waitForSync);
+            return Collection<T>().Replace(document, policy, waitForSync, BeforeItemReplaced);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> ReplaceAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return await Collection<T>().ReplaceAsync(document, policy, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().ReplaceAsync(document, policy, waitForSync, BeforeItemReplaced).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public DocumentIdentifierResult ReplaceById<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return Collection<T>().ReplaceById(id, document, rev, policy, waitForSync);
+            return Collection<T>().ReplaceById(id, document, rev, policy, waitForSync, BeforeItemReplaced);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> ReplaceByIdAsync<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null)
         {
-            return await Collection<T>().ReplaceByIdAsync(id, document, rev, policy, waitForSync).ConfigureAwait(false);
+            return await Collection<T>().ReplaceByIdAsync(id, document, rev, policy, waitForSync, BeforeItemReplaced).ConfigureAwait(false);
         }
 
         ///<summary>
