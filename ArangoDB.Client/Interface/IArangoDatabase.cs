@@ -393,7 +393,11 @@ namespace ArangoDB.Client
         /// </summary>
         /// <returns>List of collections names</returns>
         Task<List<CollectionData>> ListCollectionsAsync();
-        
+
+        /// <param name="name">Name of the database</param>
+        /// <param name="users">list of database user</param>
+        /// <returns></returns>
+        void DeleteDatabase(string name);
         
         /// <param name="name">Name of the database</param>
         /// <param name="users">list of database user</param>
