@@ -13,7 +13,7 @@ namespace ArangoDB.Client
     public partial class ArangoDatabase
     {
         public event EventHandler<ArangoDatabaseEventArgs> BeforeItemRemoved;
-        public event EventHandler<ArangoDatabaseEventArgs> BeforeItemSaved;
+        public event EventHandler<ArangoDatabaseEventArgs> BeforeItemInsertd;
         public event EventHandler<ArangoDatabaseEventArgs> BeforeItemUpdated;
         public event EventHandler<ArangoDatabaseEventArgs> BeforeItemReplaced;
 
