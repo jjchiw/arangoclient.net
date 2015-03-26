@@ -186,6 +186,10 @@ namespace ArangoDB.Client.Linq
                     return Expression.Not(operand);
                 }
             }
+            if(expression.NodeType == ExpressionType.Convert)
+            {
+                return VisitExpression(expression.Operand);
+            }
 
             return base.VisitUnaryExpression(expression);
         }
@@ -203,11 +207,11 @@ namespace ArangoDB.Client.Linq
             else
             {
                 ModelVisitor.QueryText.Append(" ( ");
-                VisitExpression(expression.Left);
+                var leftExp = VisitExpression(expression.Left);
 
                 ModelVisitor.QueryText.Append(expressionTypes[expression.NodeType]);
 
-                VisitExpression(expression.Right);
+                var rightExp = VisitExpression(expression.Right);
                 ModelVisitor.QueryText.Append(" ) ");
 
                 return expression;
@@ -247,7 +251,6 @@ namespace ArangoDB.Client.Linq
             else
             {
                 VisitExpression(expression.Expression);
-                //LinqUtility.ResolvePropertyName(expression.Member.Name)
                 ModelVisitor.QueryText.AppendFormat(".{0} ", LinqUtility.ResolveMemberName(ModelVisitor.Db,expression.Member) );
             }
 
@@ -362,32 +365,33 @@ namespace ArangoDB.Client.Linq
             throw new NotSupportedException(string.Format("Constant value of type {0} cant be translate to aql", type.ToString()));
         }
 
-        //void VisitConstantGenericList<T>(T t,List<T> value)
-        //{
-        //    foreach (var v in value)
-        //        VisitConstantValue(v, t);
-        //}
-
         protected override Expression VisitMemberInitExpression(MemberInitExpression node)
         {
-            //NewExpression n = this.VisitNew(node.NewExpression);
-
             NewExpression n = Expression.New(node.NewExpression.Constructor, node.NewExpression.Arguments);
 
             if (!TreatNewWithoutBracket)
                 ModelVisitor.QueryText.Append(" { ");
 
-            IEnumerable<MemberBinding> bindings = this.VisitMemberBindingList(node.Bindings);
+            int bindingIndex = -1;
+            foreach (var b in node.Bindings)
+            {
+                bindingIndex++;
+
+                VisitMemberBinding(b);
+
+                if(bindingIndex!=node.Bindings.Count-1)
+                    ModelVisitor.QueryText.Append(" , ");
+            }
 
             if (!TreatNewWithoutBracket)
                 ModelVisitor.QueryText.Append(" } ");
 
-            if (n != node.NewExpression || bindings != node.Bindings)
-            {
-                var e = Expression.MemberInit(n, bindings);
+            //if (n != node.NewExpression || bindings != node.Bindings)
+            //{
+            //    var e = Expression.MemberInit(n, bindings);
 
-                return e;
-            }
+            //    return e;
+            //}
 
             return node;
         }
@@ -421,23 +425,6 @@ namespace ArangoDB.Client.Linq
             return e;
         }
 
-        //protected virtual NewExpression VisitNew(NewExpression node)
-        //{
-        //    IEnumerable<Expression> args = this.Visit(node.Arguments);
-        //    if (args != node.Arguments)
-        //    {
-        //        if (node.Members != null)
-        //        {
-        //            return Expression.New(node.Constructor, args, node.Members);
-        //        }
-        //        else
-        //        {
-        //            return Expression.New(node.Constructor, args);
-        //        }
-        //    }
-        //    return node;
-        //}
-
         protected override Expression VisitSubQueryExpression(SubQueryExpression expression)
         {
             ModelVisitor.QueryText.Append(" ( ");
@@ -453,9 +440,7 @@ namespace ArangoDB.Client.Linq
         public Expression VisitNamedExpression(NamedExpression expression)
         {
             ModelVisitor.QueryText.AppendFormat(" `{0}` {1} ", expression.Name, TreatNewWithoutBracket ? "= " : ": ");
-            VisitExpression(expression.Expression);
-
-            return expression;
+            return VisitExpression(expression.Expression);
         }
 
         private string FormatUnhandledItem<T>(T unhandledItem)

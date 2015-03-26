@@ -21,6 +21,10 @@ namespace ArangoDB.Client
 
         DatabaseSetting Setting { get; set; }
 
+        IDocumentCollection<T> Collection<T>();
+
+        IEdgeCollection<T> EdgeCollection<T>();
+
         ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null, bool? count = null,
             int? batchSize = 0, TimeSpan? ttl = null, QueryOption options = null);
 
@@ -383,6 +387,47 @@ namespace ArangoDB.Client
             bool? isSystem = null, bool? isVolatile = null, CollectionType? type = null, int? numberOfShards = null, string shardKeys = null);
 
         /// <summary>
+        /// Finds documents near the given coordinate
+        /// </summary>
+        /// <param name="latitude">The latitude of the coordinate</param>
+        /// <param name="longitude">The longitude of the coordinate</param>
+        /// <param name="distance">If True, distances are returned in meters</param>
+        /// <param name="distance">If True, distances are returned in meters</param>
+        /// <param name="skip">The number of documents to skip in the query</param>
+        /// <param name="limit">The maximal amount of documents to return. The skip is applied before the limit restriction</param>
+        /// <param name="batchSize">Limits the number of results to be transferred in one batch</param>
+        /// <returns>Returns a cursor</returns>
+        ICursor<T> Near<T>(double latitude, double longitude, Expression<Func<T, object>> distance = null, string geo = null
+            , int? skip = null, int? limit = null, int? batchSize = null);
+
+        /// <summary>
+        /// Finds documents within a given radius around the coordinate
+        /// </summary>
+        /// <param name="latitude">The latitude of the coordinate</param>
+        /// <param name="longitude">The longitude of the coordinate</param>
+        /// <param name="radius">The maximal radius</param>
+        /// <param name="distance">If True, distances are returned in meters</param>
+        /// <param name="geo">The identifier of the geo-index to use</param>
+        /// <param name="skip">The number of documents to skip in the query</param>
+        /// <param name="limit">The maximal amount of documents to return. The skip is applied before the limit restriction</param>
+        /// <param name="batchSize">Limits the number of results to be transferred in one batch</param>
+        /// <returns>Returns a cursor</returns>
+        ICursor<T> Within<T>(double latitude, double longitude, double radius, Expression<Func<T, object>> distance = null, string geo = null
+            , int? skip = null, int? limit = null, int? batchSize = null);
+
+        /// <summary>
+        /// Finds all documents from the collection that match the fulltext query
+        /// </summary>
+        /// <param name="attribute">The attribute that contains the texts</param>
+        /// <param name="query">The fulltext query</param>
+        /// <param name="index">The identifier of the fulltext-index to use</param>
+        /// <param name="skip">The number of documents to skip in the query</param>
+        /// <param name="limit">The maximal amount of documents to return. The skip is applied before the limit restriction</param>
+        /// <param name="batchSize">Limits the number of results to be transferred in one batch</param>
+        /// <returns>Returns a cursor</returns>
+        ICursor<T> Fulltext<T>(Expression<Func<T, object>> attribute, string query, string index=null
+            , int? skip = null, int? limit = null, int? batchSize = null);
+
         /// List of collections name
         /// </summary>
         /// <returns>List of collections names</returns>
@@ -398,7 +443,7 @@ namespace ArangoDB.Client
         /// <param name="users">list of database user</param>
         /// <returns></returns>
         void DeleteDatabase(string name);
-        
+
         /// <param name="name">Name of the database</param>
         /// <param name="users">list of database user</param>
         /// <returns></returns>
@@ -451,7 +496,7 @@ namespace ArangoDB.Client
         /// <param name="name">Name of the graph</param>
         /// <returns>GraphIdentifierResult</returns>
         Task<GraphIdentifierResult> GetGraphAsync(string name);
-        
+
         event EventHandler<ArangoDatabaseEventArgs> BeforeItemRemoved;
         event EventHandler<ArangoDatabaseEventArgs> BeforeItemInsertd;
         event EventHandler<ArangoDatabaseEventArgs> BeforeItemUpdated;

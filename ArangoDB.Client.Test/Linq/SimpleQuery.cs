@@ -245,6 +245,258 @@ return { `byAgebyHeight` : ( for `b` in `byAge` collect `Height` = `b`.`p`.`Heig
             db.Setting.Linq.TranslateGroupByIntoName = null;
         }
 
+        [Fact]
+        public void Update()
+        {
+            var db = DatabaseGenerator.Get();
 
+            var query = db.Query<Person>().Update(p => new Person { Outfit = new Outfit { Color = "red" } });
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `p` in `Person` update 
+`p` with { `Outfit` : { `Color` : @P1 } } in `Person`".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "red");
+        }
+
+        [Fact]
+        public void Update_WithKey()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Update(f => new { Airline = "lufthansa" }, keySelector: k => k.Key);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `f` in `Flight` update 
+`f`.`_key` with @P1 in `Flight`".RemoveSpaces());
+
+            dynamic parameter = queryData.BindVars[0].Value;
+            Assert.Equal(parameter.Airline, "lufthansa");
+        }
+
+        [Fact]
+        public void Update_WithResult()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Update(f => new Flight { Airline = "lufthansa" }).ReturnResult(true);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `f` in `Flight` update 
+`f` with { `Airline` : @P1 } in `Flight` let crudResult = new return crudResult".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "lufthansa");
+        }
+
+        [Fact]
+        public void Update_WithOldResult()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Where(x => x.Code < 100).Update(f => new Flight { Airline = "lufthansa" }).ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` filter ( `x`.`Code` < @P1 ) update 
+`x` with { `Airline` : @P2 } in `Flight` let crudResult = old return crudResult".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, 100);
+            Assert.Equal(queryData.BindVars[1].Value, "lufthansa");
+        }
+
+        [Fact]
+        public void Update_ToAnotherCollection()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Update(f => new Flight { Airline = "lufthansa" }).In<Person>().ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `f` in `Flight` update 
+`f` with { `Airline` : @P1 } in `Person` let crudResult = old return crudResult".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "lufthansa");
+        }
+
+        [Fact]
+        public void Remove()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Person>().Remove();
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Person` remove `x` in `Person`".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Remove_WithKey()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Remove(keySelector: x => x.Key);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` remove `x`.`_key` in `Flight`".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Remove_WithResult()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Remove().ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` remove `x` in `Flight` let crudResult = old return crudResult".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Remove_InAnotherCollection()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Remove().In<Person>().ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` remove 
+`x` in `Person` let crudResult = old return crudResult".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Insert()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Person>().Insert();
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Person` insert `x` in `Person`".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Insert_New()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Person>().Insert(p => new Person { Outfit = new Outfit { Color = "red" } });
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `p` in `Person` insert { `Outfit` : { `Color` : @P1 } } in `Person`".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "red");
+        }
+
+        [Fact]
+        public void Insert_WithResult()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Insert().ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` insert `x` in `Flight` let crudResult = new return crudResult".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Insert_InAnotherCollection()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Insert().In<Person>().ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` insert 
+`x` in `Person` let crudResult = new return crudResult".RemoveSpaces());
+        }
+
+        [Fact]
+        public void Replace()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Person>().Replace(p => new Person { Outfit = new Outfit { Color = "red" } });
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `p` in `Person` replace 
+`p` with { `Outfit` : { `Color` : @P1 } } in `Person`".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "red");
+        }
+
+        [Fact]
+        public void Replace_WithKey()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Replace(f => new { Airline = "lufthansa" }, keySelector: k => k.Key);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `f` in `Flight` replace 
+`f`.`_key` with @P1 in `Flight`".RemoveSpaces());
+
+            dynamic parameter = queryData.BindVars[0].Value;
+            Assert.Equal(parameter.Airline, "lufthansa");
+        }
+
+        [Fact]
+        public void Replace_WithResult()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Replace(f => new Flight { Airline = "lufthansa" }).ReturnResult(true);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `f` in `Flight` replace 
+`f` with { `Airline` : @P1 } in `Flight` let crudResult = new return crudResult".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "lufthansa");
+        }
+
+        [Fact]
+        public void Replace_WithOldResult()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Where(x => x.Code < 100).Replace(f => new Flight { Airline = "lufthansa" }).ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `x` in `Flight` filter ( `x`.`Code` < @P1 ) replace 
+`x` with { `Airline` : @P2 } in `Flight` let crudResult = old return crudResult".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, 100);
+            Assert.Equal(queryData.BindVars[1].Value, "lufthansa");
+        }
+
+        [Fact]
+        public void Replace_ToAnotherCollection()
+        {
+            var db = DatabaseGenerator.Get();
+
+            var query = db.Query<Flight>().Replace(f => new Flight { Airline = "lufthansa" }).In<Person>().ReturnResult(false);
+
+            var queryData = query.GetQueryData();
+
+            Assert.Equal(queryData.Query.RemoveSpaces(), @"for `f` in `Flight` replace 
+`f` with { `Airline` : @P1 } in `Person` let crudResult = old return crudResult".RemoveSpaces());
+
+            Assert.Equal(queryData.BindVars[0].Value, "lufthansa");
+        }
     }
 }
