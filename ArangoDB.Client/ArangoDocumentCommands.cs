@@ -37,7 +37,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> InsertAsync<T>(object document, bool? createCollection = null, bool? waitForSync = null)
         {
-            return await Collection<T>().InsertAsync(document, createCollection, waitForSync, BeforeItemInsertd).ConfigureAwait(false);
+            return await Collection<T>().InsertAsync(document, createCollection, waitForSync, BeforeItemInserted).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public DocumentIdentifierResult Insert<T>(object document, bool? createCollection = null, bool? waitForSync = null)
         {
-            return Collection<T>().Insert(document, createCollection, waitForSync, BeforeItemInsertd);
+            return Collection<T>().Insert(document, createCollection, waitForSync, BeforeItemInserted);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public DocumentIdentifierResult InsertEdge<T>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null)
         {
-            return EdgeCollection<T>().InsertEdge(from, to, edgeDocument, createCollection, waitForSync, BeforeItemInsertd);
+            return EdgeCollection<T>().InsertEdge(from, to, edgeDocument, createCollection, waitForSync, BeforeItemInserted);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace ArangoDB.Client
         /// <returns>Document identifiers</returns>
         public async Task<DocumentIdentifierResult> InsertEdgeAsync<T>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null)
         {
-            return await EdgeCollection<T>().InsertEdgeAsync(from, to, edgeDocument, createCollection, waitForSync, BeforeItemInsertd).ConfigureAwait(false);
+            return await EdgeCollection<T>().InsertEdgeAsync(from, to, edgeDocument, createCollection, waitForSync, BeforeItemInserted).ConfigureAwait(false);
         }
 
         /// <summary>

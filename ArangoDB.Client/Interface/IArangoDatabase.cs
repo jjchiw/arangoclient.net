@@ -498,7 +498,7 @@ namespace ArangoDB.Client
         Task<GraphIdentifierResult> GetGraphAsync(string name);
 
         event EventHandler<ArangoDatabaseEventArgs> BeforeItemRemoved;
-        event EventHandler<ArangoDatabaseEventArgs> BeforeItemInsertd;
+        event EventHandler<ArangoDatabaseEventArgs> BeforeItemInserted;
         event EventHandler<ArangoDatabaseEventArgs> BeforeItemUpdated;
         event EventHandler<ArangoDatabaseEventArgs> BeforeItemReplaced;
     }
