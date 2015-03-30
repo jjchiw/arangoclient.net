@@ -17,17 +17,24 @@ namespace ArangoDB.Client.Http
         private static Lazy<HttpClient> httpClientLazily = new Lazy<HttpClient>(() => {
             connectionHandler = new HttpConnectionHandler();
             var proxy = ArangoDatabase.ClientSetting.Proxy;
-            connectionHandler.InnerHandler = new HttpClientHandler
+            if (proxy != null)
             {
-                UseProxy = proxy != null,
-                Proxy = proxy
-            };
+                connectionHandler.InnerHandler = new HttpClientHandler
+                    {
+                        UseProxy = true,
+                        Proxy = proxy
+                    };
+            }
+            else
+            {
+                connectionHandler.InnerHandler = new HttpClientHandler();
+            }
 
             ArangoDatabase.ClientSetting.IsHttpClientInitialied = true;
 
             var httpClient = new HttpClient(connectionHandler, true);
             httpClient.DefaultRequestHeaders.ExpectContinue = false;
-            
+
             return httpClient;
         });
 
