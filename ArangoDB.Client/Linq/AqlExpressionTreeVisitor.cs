@@ -20,9 +20,13 @@ namespace ArangoDB.Client.Linq
     {
         static Dictionary<ExpressionType, string> expressionTypes;
         static Dictionary<string, string> aqlMethods;
-        public AqlModelVisitor ModelVisitor;
 
-        public bool TreatNewWithoutBracket;
+        public AqlModelVisitor ModelVisitor { get; set; }
+        public QueryModel QueryModel { get; set; }
+
+        public bool TreatNewWithoutBracket { get; set; }
+        public bool HandleLet { get; set; }
+        public bool HandleJoin { get; set; }
 
         static AqlExpressionTreeVisitor()
         {
@@ -90,6 +94,9 @@ namespace ArangoDB.Client.Linq
                 {"Sqrt","sqrt"},
                 {"Rand","rand"},
                 
+                /*object-document*/
+                {"Merge","merge"},
+
                 /*numeric*/
                 //{"",""},
                 //{"",""},
@@ -150,6 +157,13 @@ namespace ArangoDB.Client.Linq
         public AqlExpressionTreeVisitor(AqlModelVisitor modelVisitor)
         {
             this.ModelVisitor = modelVisitor;
+        }
+
+        protected override Expression VisitParameterExpression(ParameterExpression expression)
+        {
+            ModelVisitor.QueryText.AppendFormat(" {0} ", LinqUtility.ResolvePropertyName(expression.Name));
+
+            return expression;
         }
 
         protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
@@ -263,7 +277,7 @@ namespace ArangoDB.Client.Linq
             parentModelVisitor.ParameterNameCounter++;
             string parameterName = "P" + parentModelVisitor.ParameterNameCounter;
 
-            this.ModelVisitor.QueryData.BindVars.Add(new QueryParameter() { Name = parameterName, Value = expression.Value });
+            parentModelVisitor.QueryData.BindVars.Add(new QueryParameter() { Name = parameterName, Value = expression.Value });
 
             ModelVisitor.QueryText.AppendFormat(" @{0} ", parameterName);
 
@@ -427,12 +441,22 @@ namespace ArangoDB.Client.Linq
 
         protected override Expression VisitSubQueryExpression(SubQueryExpression expression)
         {
-            ModelVisitor.QueryText.Append(" ( ");
+            if(!HandleJoin && !HandleLet)
+                ModelVisitor.QueryText.Append(" ( ");
+
             var visitor = new AqlModelVisitor(ModelVisitor.Db);
+
+            if (HandleLet)
+                visitor.DefaultAssociatedIdentifier = QueryModel.MainFromClause.ItemName;
+
             visitor.QueryText = this.ModelVisitor.QueryText;
             visitor.ParnetModelVisitor = this.ModelVisitor;
+            visitor.IgnoreFromClause = HandleLet;
+
             visitor.VisitQueryModel(expression.QueryModel);
-            ModelVisitor.QueryText.Append(" ) ");
+
+            if (!HandleJoin && !HandleLet)
+                ModelVisitor.QueryText.Append(" ) ");
 
             return expression;
         }
