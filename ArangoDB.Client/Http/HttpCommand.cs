@@ -21,9 +21,10 @@ namespace ArangoDB.Client.Http
         Edge = 2,
         Cursor = 3,
         Simple = 4,
-        AllEdges=5,
-        Collection=6,
-        Graph=7
+        AllEdges = 5,
+        Collection = 6,
+        Transaction = 7,
+	Graph=8
     }
 
     public class HttpCommand
@@ -43,7 +44,8 @@ namespace ArangoDB.Client.Http
                 {CommandApi.Simple,"simple"},
                 {CommandApi.AllEdges,"edges"},
                 {CommandApi.Collection,"collection"},
-                {CommandApi.Graph,"gharial"}
+                {CommandApi.Transaction,"transaction"},
+		{CommandApi.Graph,"gharial"}
             };
         }
 
