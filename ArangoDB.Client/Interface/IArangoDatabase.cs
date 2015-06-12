@@ -491,5 +491,45 @@ namespace ArangoDB.Client
         /// <param name="name">Name of the graph</param>
         /// <returns>GraphIdentifierResult</returns>
         Task<GraphIdentifierResult> GetGraphAsync(string name);
+
+        /// <summary>
+        /// Deletes the edge
+        /// </summary>
+        /// <param name="edge">edge reference</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until document has been synced to disk</param>
+        /// <returns></returns>
+        DocumentIdentifierResult RemoveEdge<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// Deletes the edge
+        /// </summary>
+        /// <param name="edge">edge reference</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until edge has been synced to disk</param>
+        /// <returns></returns>
+        Task<DocumentIdentifierResult> RemoveEdgeAsync<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// Deletes the edge without change tracking
+        /// </summary>
+        /// <param name="id">The edge handle or key of edge</param>
+        /// <param name="rev">Conditionally replace a edge based on revision id</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until edge has been synced to disk</param>
+        /// <returns></returns>
+        DocumentIdentifierResult RemoveEdgeById<T>(string id, string rev = null, ReplacePolicy? policy = null,
+            bool? waitForSync = null, Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// Deletes the edge without change tracking
+        /// </summary>
+        /// <param name="id">The edge handle or key of edge</param>
+        /// <param name="rev">Conditionally replace a edge based on revision id</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until edge has been synced to disk</param>
+        /// <returns></returns>
+        Task<DocumentIdentifierResult> RemoveEdgeByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null,
+            bool? waitForSync = null, Action<BaseResult> baseResult = null);
     }
 }

@@ -197,7 +197,7 @@ namespace ArangoDB.Client
         }
 
         ///<summary>
-        ///Partially updates the document 
+        ///Partially updates the document
         ///</summary>
         ///<param name="document">Representation of the patch document</param>
         ///<param name="keepNull">For remove any attributes from the existing document that are contained in the patch document with an attribute value of null</param>
@@ -212,7 +212,7 @@ namespace ArangoDB.Client
         }
 
         ///<summary>
-        ///Partially updates the document 
+        ///Partially updates the document
         ///</summary>
         ///<param name="document">Representation of the patch document</param>
         ///<param name="keepNull">For remove any attributes from the existing document that are contained in the patch document with an attribute value of null</param>
@@ -427,6 +427,58 @@ namespace ArangoDB.Client
             , int? skip = null, int? limit = null, int? batchSize = null)
         {
             return Collection<T>().Fulltext(attribute, query, index, skip, limit, batchSize);
+        }
+
+        /// <summary>
+        /// Deletes the edge
+        /// </summary>
+        /// <param name="edge">edge reference</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until document has been synced to disk</param>
+        /// <returns></returns>
+        public DocumentIdentifierResult RemoveEdge<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        {
+            return EdgeCollection<T>().Remove(edge, policy, waitForSync, baseResult);
+        }
+
+        /// <summary>
+        /// Deletes the edge
+        /// </summary>
+        /// <param name="edge">edge reference</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until edge has been synced to disk</param>
+        /// <returns></returns>
+        public async Task<DocumentIdentifierResult> RemoveEdgeAsync<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        {
+            return await EdgeCollection<T>().RemoveAsync(edge, policy, waitForSync, baseResult).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Deletes the edge without change tracking
+        /// </summary>
+        /// <param name="id">The edge handle or key of edge</param>
+        /// <param name="rev">Conditionally replace a edge based on revision id</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until edge has been synced to disk</param>
+        /// <returns></returns>
+        public DocumentIdentifierResult RemoveEdgeById<T>(string id, string rev = null, ReplacePolicy? policy = null,
+            bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        {
+            return EdgeCollection<T>().RemoveById(id, rev, policy, waitForSync, baseResult);
+        }
+
+        /// <summary>
+        /// Deletes the edge without change tracking
+        /// </summary>
+        /// <param name="id">The edge handle or key of edge</param>
+        /// <param name="rev">Conditionally replace a edge based on revision id</param>
+        /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
+        /// <param name="waitForSync">Wait until edge has been synced to disk</param>
+        /// <returns></returns>
+        public async Task<DocumentIdentifierResult> RemoveEdgeByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null,
+            bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        {
+            return await EdgeCollection<T>().RemoveByIdAsync(id, rev, policy, waitForSync, baseResult).ConfigureAwait(false);
         }
     }
 }
