@@ -278,7 +278,7 @@ namespace ArangoDB.Client
             string rev = policy.HasValue && policy.Value == ReplacePolicy.Error ? container.Rev : null;
 
             var result = await ReplaceByIdAsync(container.Id, document, rev, policy, waitForSync, baseResult).ConfigureAwait(false);
-            
+
             if (!result.Error)
             {
                 container.Rev = result.Rev;
@@ -354,7 +354,7 @@ namespace ArangoDB.Client
         }
 
         ///<summary>
-        ///Partially updates the document 
+        ///Partially updates the document
         ///</summary>
         ///<param name="document">Representation of the patch document</param>
         ///<param name="keepNull">For remove any attributes from the existing document that are contained in the patch document with an attribute value of null</param>
@@ -369,7 +369,7 @@ namespace ArangoDB.Client
         }
 
         ///<summary>
-        ///Partially updates the document 
+        ///Partially updates the document
         ///</summary>
         ///<param name="document">Representation of the patch document</param>
         ///<param name="keepNull">For remove any attributes from the existing document that are contained in the patch document with an attribute value of null</param>
@@ -407,7 +407,7 @@ namespace ArangoDB.Client
             }
             else
                 return new DocumentIdentifierResult() { Id = container.Id, Key = container.Key, Rev = container.Rev };
-            
+
         }
 
         private async Task<DocumentIdentifierResult> DocumentHeaderAsync(string id, string rev = null)
@@ -464,7 +464,7 @@ namespace ArangoDB.Client
 
             var command = new HttpCommand(this.db)
             {
-                Api = CommandApi.Document,
+                Api = collectionType == CollectionType.Document ? CommandApi.Document : CommandApi.Edge,
                 Method = HttpMethod.Delete,
                 Query = new Dictionary<string, string>(),
                 Command = apiCommand

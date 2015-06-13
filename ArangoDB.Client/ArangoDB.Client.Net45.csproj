@@ -45,6 +45,7 @@
     <Compile Include="ArangoDatabaseCommands.cs" />
     <Compile Include="ArangoDatabaseEventArgs.cs" />
     <Compile Include="ArangoDocumentCommands.cs" />
+    <Compile Include="ArangoGraphCommands.cs" />
     <Compile Include="ArangoServerException.cs" />
     <Compile Include="BaseResultAnalyzer.cs" />
     <Compile Include="ChangeTracking\DocumentContainer.cs" />
