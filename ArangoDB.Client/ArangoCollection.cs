@@ -94,7 +94,7 @@ namespace ArangoDB.Client
 
             var command = new HttpCommand(this.db)
             {
-                Api = CommandApi.Document,
+                Api =  CommandApi.Document,
                 Method = HttpMethod.Post,
                 Query = new Dictionary<string, string>()
             };
@@ -221,7 +221,7 @@ namespace ArangoDB.Client
 
             var command = new HttpCommand(this.db)
             {
-                Api = CommandApi.Document,
+                Api = collectionType == CollectionType.Document ? CommandApi.Document : CommandApi.Edge,
                 Method = HttpMethod.Put,
                 Query = new Dictionary<string, string>(),
                 Command = apiCommand
@@ -331,7 +331,7 @@ namespace ArangoDB.Client
 
             var command = new HttpCommand(this.db)
             {
-                Api = CommandApi.Document,
+                Api = collectionType == CollectionType.Document ? CommandApi.Document : CommandApi.Edge,
                 Method = new HttpMethod("PATCH"),
                 Query = new Dictionary<string, string>(),
                 Command = apiCommand
@@ -416,7 +416,7 @@ namespace ArangoDB.Client
 
             var command = new HttpCommand(this.db)
             {
-                Api = CommandApi.Document,
+                Api = collectionType == CollectionType.Document ? CommandApi.Document : CommandApi.Edge,
                 Method = HttpMethod.Head,
                 Query = new Dictionary<string, string>(),
                 Command = apiCommand
