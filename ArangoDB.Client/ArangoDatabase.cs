@@ -143,14 +143,14 @@ namespace ArangoDB.Client
         }
 
         public ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null, bool? count = null,
-            int? batchSize = 0, TimeSpan? ttl = null, QueryOption options = null)
+            int? batchSize = null, TimeSpan? ttl = null, QueryOption options = null)
         {
             QueryData data = new QueryData();
 
             data.Query = query;
-
-            data.BatchSize = Utils.ChangeIfNotSpecified<int>(batchSize, Setting.Cursor.BatchSize);
-            data.Count = Utils.ChangeIfNotSpecified<bool>(count, Setting.Cursor.Count);
+            
+            data.BatchSize = batchSize ?? Setting.Cursor.BatchSize;
+            data.Count = count ?? Setting.Cursor.Count;
 
             if (ttl.HasValue)
                 data.Ttl = ttl.Value.TotalSeconds;

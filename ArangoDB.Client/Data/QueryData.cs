@@ -1,10 +1,6 @@
 ﻿using ArangoDB.Client.Common.Newtonsoft.Json;
 using ArangoDB.Client.Serialization.Converters;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArangoDB.Client.Data
 {
@@ -21,7 +17,8 @@ namespace ArangoDB.Client.Data
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public double? Ttl { get; set; }
-        
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(QueryParameterConverter))]
         public IList<QueryParameter> BindVars { get; set; }
 

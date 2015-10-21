@@ -1,18 +1,13 @@
 ﻿using ArangoDB.Client.ChangeTracking;
 using ArangoDB.Client.Common.Newtonsoft.Json.Linq;
-using ArangoDB.Client.Cursor;
 using ArangoDB.Client.Data;
 using ArangoDB.Client.Http;
 using ArangoDB.Client.Serialization;
 using ArangoDB.Client.Utility;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ArangoDB.Client
@@ -94,7 +89,7 @@ namespace ArangoDB.Client
 
             var command = new HttpCommand(this.db)
             {
-                Api =  CommandApi.Document,
+                Api = CommandApi.Document,
                 Method = HttpMethod.Post,
                 Query = new Dictionary<string, string>()
             };
@@ -180,7 +175,7 @@ namespace ArangoDB.Client
                 db.SharedSetting.IdentifierModifier.Modify(edgeDocument, result.Result, from, to);
             }
 
-            if(baseResult!=null)
+            if (baseResult != null)
                 baseResult(result.BaseResult);
 
             return result.Result;
@@ -235,7 +230,7 @@ namespace ArangoDB.Client
 
             var result = await command.RequestMergedResult<DocumentIdentifierResult>(document).ConfigureAwait(false);
 
-            if(!result.BaseResult.Error)
+            if (!result.BaseResult.Error)
                 db.SharedSetting.IdentifierModifier.Modify(document, result.Result);
 
             if (baseResult != null)
@@ -387,7 +382,7 @@ namespace ArangoDB.Client
 
             DocumentContainer container = null;
             JObject jObject = null;
-            var changed = db.ChangeTracker.GetChanges(document,out container, out jObject);
+            var changed = db.ChangeTracker.GetChanges(document, out container, out jObject);
 
             policy = Utils.ChangeIfNotSpecified<ReplacePolicy>(policy, db.Setting.Document.ReplacePolicy);
             string rev = policy.HasValue && policy.Value == ReplacePolicy.Error ? container.Rev : null;
@@ -478,7 +473,7 @@ namespace ArangoDB.Client
 
             var result = await command.RequestMergedResult<DocumentIdentifierResult>().ConfigureAwait(false);
 
-            if(baseResult!=null)
+            if (baseResult != null)
                 baseResult(result.BaseResult);
 
             return result.Result;
@@ -552,7 +547,7 @@ namespace ArangoDB.Client
 
             var result = await command.RequestDistinctResult<T>().ConfigureAwait(false);
 
-            if(baseResult != null)
+            if (baseResult != null)
                 baseResult(result.BaseResult);
 
             return result.Result;
@@ -593,7 +588,7 @@ namespace ArangoDB.Client
 
             var result = await command.RequestGenericListResult<T, EdgesInheritedCommandResult<List<T>>>().ConfigureAwait(false);
 
-            if(baseResult != null)
+            if (baseResult != null)
                 baseResult(result.BaseResult);
 
             return result.Result;
@@ -608,7 +603,7 @@ namespace ArangoDB.Client
         /// <returns>Returns a cursor</returns>
         public ICursor<T> All(int? skip = null, int? limit = null, int? batchSize = null)
         {
-            batchSize = Utils.ChangeIfNotSpecified<int>(batchSize, db.Setting.Cursor.BatchSize);
+            batchSize = batchSize ?? db.Setting.Cursor.BatchSize;
 
             SimpleData data = new SimpleData
             {
@@ -642,7 +637,7 @@ namespace ArangoDB.Client
         public ICursor<T> Range(Expression<Func<T, object>> attribute, object left, object right, bool? closed = false,
             int? skip = null, int? limit = null, int? batchSize = null)
         {
-            batchSize = Utils.ChangeIfNotSpecified<int>(batchSize, db.Setting.Cursor.BatchSize);
+            batchSize = batchSize ?? db.Setting.Cursor.BatchSize;
 
             SimpleData data = new SimpleData
             {
@@ -676,7 +671,7 @@ namespace ArangoDB.Client
         /// <returns>Returns a cursor</returns>
         public ICursor<T> ByExample(object example, int? skip = null, int? limit = null, int? batchSize = null)
         {
-            batchSize = Utils.ChangeIfNotSpecified<int>(batchSize, db.Setting.Cursor.BatchSize);
+            batchSize = batchSize ?? db.Setting.Cursor.BatchSize;
 
             SimpleData data = new SimpleData
             {
@@ -711,13 +706,13 @@ namespace ArangoDB.Client
         public ICursor<T> Near(double latitude, double longitude, Expression<Func<T, object>> distance = null, string geo = null
             , int? skip = null, int? limit = null, int? batchSize = null)
         {
-            batchSize = Utils.ChangeIfNotSpecified<int>(batchSize, db.Setting.Cursor.BatchSize);
+            batchSize = batchSize ?? db.Setting.Cursor.BatchSize;
 
             SimpleData data = new SimpleData
             {
                 Latitude = latitude,
                 Longitude = longitude,
-                Distance = distance!=null ? db.SharedSetting.Collection.ResolvePropertyName(distance) : null,
+                Distance = distance != null ? db.SharedSetting.Collection.ResolvePropertyName(distance) : null,
                 Geo = geo,
                 BatchSize = batchSize,
                 Collection = collectionName,
@@ -750,7 +745,7 @@ namespace ArangoDB.Client
         public ICursor<T> Within(double latitude, double longitude, double radius, Expression<Func<T, object>> distance = null, string geo = null
             , int? skip = null, int? limit = null, int? batchSize = null)
         {
-            batchSize = Utils.ChangeIfNotSpecified<int>(batchSize, db.Setting.Cursor.BatchSize);
+            batchSize = batchSize ?? db.Setting.Cursor.BatchSize;
 
             SimpleData data = new SimpleData
             {
@@ -785,10 +780,10 @@ namespace ArangoDB.Client
         /// <param name="limit">The maximal amount of documents to return. The skip is applied before the limit restriction</param>
         /// <param name="batchSize">Limits the number of results to be transferred in one batch</param>
         /// <returns>Returns a cursor</returns>
-        public ICursor<T> Fulltext(Expression<Func<T, object>> attribute, string query, string index=null
+        public ICursor<T> Fulltext(Expression<Func<T, object>> attribute, string query, string index = null
             , int? skip = null, int? limit = null, int? batchSize = null)
         {
-            batchSize = Utils.ChangeIfNotSpecified<int>(batchSize, db.Setting.Cursor.BatchSize);
+            batchSize = batchSize ?? db.Setting.Cursor.BatchSize;
 
             SimpleData data = new SimpleData
             {
@@ -844,7 +839,7 @@ namespace ArangoDB.Client
 
             var result = await command.RequestGenericSingleResult<T, DocumentInheritedCommandResult<T>>(data).ConfigureAwait(false);
 
-            if(baseResult != null)
+            if (baseResult != null)
                 baseResult(result.BaseResult);
 
             return result.Result;
@@ -880,7 +875,7 @@ namespace ArangoDB.Client
 
             var result = await command.RequestGenericSingleResult<T, DocumentInheritedCommandResult<T>>(data).ConfigureAwait(false);
 
-            if(baseResult != null)
+            if (baseResult != null)
                 baseResult(result.BaseResult);
 
             return result.Result;
