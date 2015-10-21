@@ -21,11 +21,30 @@ namespace ArangoDB.Client.Data
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public double? Ttl { get; set; }
-        
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(QueryParameterConverter))]
         public IList<QueryParameter> BindVars { get; set; }
 
         public QueryOption Options { get; set; }
+
+        public string QueryReplacedWithVariables(IArangoDatabase db)
+        {
+            string query = Query;
+
+            string[] breakWords = new string[] { "for","filter","and","sort","limit","return","collect","let"
+            ,"remove","update","replace","insert","upsert"};
+
+            foreach (var b in breakWords)
+                query = query.Replace(b, Environment.NewLine + b);
+
+            if(BindVars!=null)
+                for (int i = 0; i < BindVars.Count; i++)
+                    query = query.Replace($"@{BindVars[i].Name}",
+                        new Serialization.DocumentSerializer(db).SerializeWithoutReader(BindVars[i].Value));
+            
+            return query;
+        }
 
         public QueryData()
         {

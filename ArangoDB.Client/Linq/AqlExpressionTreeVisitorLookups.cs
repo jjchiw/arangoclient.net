@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArangoDB.Client.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,8 +13,33 @@ namespace ArangoDB.Client.Linq
         static Dictionary<ExpressionType, string> expressionTypes;
         static Dictionary<string, string> aqlMethods;
 
+        static HashSet<string> methodsWithFirstGenericArgument;
+        static HashSet<string> methodsWithSecondGenericArgument;
+        static Dictionary<string, string> methodsWithNoParenthesis;
+
+        static Dictionary<Type, Func<object, string>> enumToStrings = new Dictionary<Type, Func<object, string>>
+        {
+            //[typeof(EdgeDirection)] = (v) => Utils.EdgeDirectionToString((EdgeDirection)v)
+        };
+
         static AqlExpressionTreeVisitor()
         {
+            methodsWithFirstGenericArgument = new HashSet<string>
+            {
+                "near","within","within_rectangle","edges","neighbors","traversal","traversal_tree"
+                ,"shortest_path","paths"
+            };
+
+            methodsWithSecondGenericArgument = new HashSet<string>
+            {
+                "neighbors","traversal","traversal_tree","shortest_path","paths"
+            };
+
+            methodsWithNoParenthesis = new Dictionary<string, string>
+            {
+                ["in"] = "in"
+            };
+
             expressionTypes = new Dictionary<ExpressionType, string>()
             {
                 {ExpressionType.Equal, " == "},
@@ -90,8 +116,18 @@ namespace ArangoDB.Client.Linq
                 {"DateSecond","date_second"},
                 {"DateMilliSecond","date_millisecond"},
                 {"DateNow","date_now"},
+                {"DateIsoWeek","date_isoweek"},
+                {"DateLeapYear","date_leapyear"},
+                {"DateQuarter","date_quarter"},
+                {"DateDaysInMonth","date_days_in_month"},
+                {"DateAdd","date_add"},
+                {"DateSubtract","date_subtract"},
+                {"DateDiff","date_diff"},
+                {"DateCompare","date_compare"},
+                {"DateFormat","date_format"},
 
                 /*array*/
+                {"In","in"},
                 {"Length","length"},
                 {"Flatten","flatten"},
                 {"Min","min"},
@@ -147,7 +183,27 @@ namespace ArangoDB.Client.Linq
                 {"Traversal","traversal"},
                 {"TraversalTree","traversal_tree"},
                 {"ShortestPath","shortest_path"},
-                {"Paths","paths"}
+                {"Paths","paths"},
+
+                /*graph*/
+                { "GraphEdges","graph_edges" },
+                { "GraphVertices","graph_vertices" },
+                { "GraphNeighbors","graph_neighbors" },
+                { "GraphCommonNeighbors","graph_common_neighbors" },
+                { "GraphCommonProperties","graph_common_properties" },
+                { "GraphPaths","graph_paths" },
+                { "GraphShortestPath","graph_shortest_path" },
+                { "GraphTraversal","graph_traversal" },
+                { "GraphTraversalTree","graph_traversal_tree" },
+                { "GraphDistanceTo","graph_distance_to" },
+                { "GraphAbsoluteEccentricity","graph_absolute_eccentricity" },
+                { "GraphEccentricity","graph_eccentricity" },
+                { "GraphAbsoluteCloseness","graph_absolute_closeness" },
+                { "GraphCloseness","graph_closeness" },
+                { "GraphAbsoluteBetweenness","graph_absolute_betweenness" },
+                { "GraphBetweenness","graph_betweenness" },
+                { "GraphRadius","graph_radius" },
+                { "GraphDiameter","graph_diameter" }
             };
         }
     }

@@ -25,13 +25,21 @@ namespace ArangoDB.Client
 
         IEdgeCollection<T> EdgeCollection<T>();
 
+        IDocumentCollection Collection(string collection);
+
+        IEdgeCollection EdgeCollection(string collection);
+
         ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null, bool? count = null,
-            int? batchSize = 0, TimeSpan? ttl = null, QueryOption options = null);
+            int? batchSize = null, TimeSpan? ttl = null, QueryOption options = null);
 
         AqlQueryable<T> Query<T>();
 
         IQueryable<AQL> Query();
 
+        void Log(string message);
+
+        bool LoggerAvailable { get; }
+        
         /// <summary>
         /// Get Document JsonObject and Identifiers
         /// </summary>
@@ -53,7 +61,7 @@ namespace ArangoDB.Client
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> InsertAsync<T>(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> InsertAsync<T>(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Creates a new document in the collection for specific type
@@ -62,7 +70,7 @@ namespace ArangoDB.Client
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        DocumentIdentifierResult Insert<T>(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult Insert<T>(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Creates a new edge document in the collection
@@ -73,7 +81,7 @@ namespace ArangoDB.Client
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        DocumentIdentifierResult InsertEdge<T>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult InsertEdge<T, TFrom, TTo>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Creates a new edge document in the collection
@@ -84,7 +92,7 @@ namespace ArangoDB.Client
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> InsertEdgeAsync<T>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> InsertEdgeAsync<T,TFrom, TTo>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Completely updates the document
@@ -94,7 +102,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        DocumentIdentifierResult Replace<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult Replace<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Completely updates the document
@@ -105,7 +113,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> ReplaceAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> ReplaceAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Completely updates the document with no change tracking
@@ -116,8 +124,8 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        DocumentIdentifierResult ReplaceById<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-
+        IDocumentIdentifierResult ReplaceById<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        
         /// <summary>
         /// Completely updates the document with no change tracking
         /// </summary>
@@ -127,8 +135,8 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> ReplaceByIdAsync<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-
+        Task<IDocumentIdentifierResult> ReplaceByIdAsync<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        
         ///<summary>
         ///Partially updates the document without change tracking
         ///</summary>
@@ -140,8 +148,8 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        DocumentIdentifierResult UpdateById<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-
+        IDocumentIdentifierResult UpdateById<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        
         ///<summary>
         ///Partially updates the document without change tracking
         ///</summary>
@@ -153,7 +161,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> UpdateByIdAsync<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> UpdateByIdAsync<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         ///<summary>
         ///Partially updates the document
@@ -164,7 +172,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        DocumentIdentifierResult Update<T>(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult Update<T>(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         ///<summary>
         ///Partially updates the document
@@ -175,7 +183,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> UpdateAsync<T>(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> UpdateAsync<T>(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -185,7 +193,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        DocumentIdentifierResult RemoveById<T>(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult RemoveById<T>(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -195,7 +203,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        Task<DocumentIdentifierResult> RemoveByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> RemoveByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes the document
@@ -204,7 +212,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        DocumentIdentifierResult Remove<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult Remove<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes the document
@@ -213,8 +221,8 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        Task<DocumentIdentifierResult> RemoveAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-
+        Task<IDocumentIdentifierResult> RemoveAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        
         /// <summary>
         /// Reads a single document
         /// </summary>
@@ -228,6 +236,24 @@ namespace ArangoDB.Client
         /// <param name="id">The document handle or key of document</param>
         /// <returns>A Document</returns>
         Task<T> DocumentAsync<T>(string id, Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// Check if document exists
+        /// </summary>
+        /// <param name="id">The document handle or key of document</param>
+        /// <param name="onDocumentLoad">Runs when document loaded</param>
+        /// <param name="baseResult">Runs when base result is ready</param>
+        /// <returns>A Document</returns>
+        Task<bool> ExistsAsync<T>(string id, Action<T> onDocumentLoad = null, Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// Check if document exists
+        /// </summary>
+        /// <param name="id">The document handle or key of document</param>
+        /// <param name="onDocumentLoad">Runs when document loaded</param>
+        /// <param name="baseResult">Runs when base result is ready</param>
+        /// <returns>A Document</returns>
+        bool Exists<T>(string id, Action<T> onDocumentLoad = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Read in or outbound edges
@@ -373,6 +399,22 @@ namespace ArangoDB.Client
             bool? isSystem = null, bool? isVolatile = null, CollectionType? type = null, int? numberOfShards = null, string shardKeys = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
+        /// List of collections
+        /// </summary>
+        /// <param name="excludeSystem">Exclude system collections</param>
+        /// <param name="baseResult">Runs when base result is ready</param>
+        /// <returns>List of collection properties</returns>
+        List<CreateCollectionResult> ListCollections(bool excludeSystem = true, Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// List of collections
+        /// </summary>
+        /// <param name="excludeSystem">Exclude system collections</param>
+        /// <param name="baseResult">Runs when base result is ready</param>
+        /// <returns>List of collection properties</returns>
+        Task<List<CreateCollectionResult>> ListCollectionsAsync(bool excludeSystem = true, Action<BaseResult> baseResult = null);
+
+        /// <summary>
         /// Creates a collection
         /// </summary>
         /// <param name="name">Name of the collection</param>
@@ -388,6 +430,27 @@ namespace ArangoDB.Client
         Task<CreateCollectionResult> CreateCollectionAsync(string name, bool? waitForSync = null, bool? doCompact = null, decimal? journalSize = null,
             bool? isSystem = null, bool? isVolatile = null, CollectionType? type = null, int? numberOfShards = null, string shardKeys = null, Action<BaseResult> baseResult = null);
 
+
+        /// <summary>
+        /// Graph methods container
+        /// </summary>
+        /// <param name="graphName">The name of the graph</param>
+        /// <returns></returns>
+        IArangoGraph Graph(string graphName);
+
+        /// <summary>
+        /// Lists all graphs
+        /// </summary>
+        /// <param name="baseResult"></param>
+        /// <returns>List<GraphIdentifierResult></returns>
+        Task<List<GraphIdentifierResult>> ListGraphsAsync(Action<BaseResult> baseResult = null);
+
+        /// <summary>
+        /// Lists all graphs
+        /// </summary>
+        /// <param name="baseResult"></param>
+        /// <returns>List<GraphIdentifierResult></returns>
+        List<GraphIdentifierResult> ListGraphs(Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Finds documents near the given coordinate
@@ -417,7 +480,7 @@ namespace ArangoDB.Client
         /// <returns>Returns a cursor</returns>
         ICursor<T> Within<T>(double latitude, double longitude, double radius, Expression<Func<T, object>> distance = null, string geo = null
             , int? skip = null, int? limit = null, int? batchSize = null);
-
+        
         /// <summary>
         /// Finds all documents from the collection that match the fulltext query
         /// </summary>
@@ -474,21 +537,26 @@ namespace ArangoDB.Client
         CreateGraphResult CreateGraph(string name, List<EdgeDefinitionData> edgeDefinitions, List<string> orphanCollections = null);
 
         /// <summary>
-        /// Creates a graph
+        /// Executes a server-side traversal
         /// </summary>
-        /// <param name="name">Name of the graph</param>
-        /// <param name="edgeDefinitions">If true then the data is synchronised to disk before returning from a document create, update, replace or removal operation</param>
-        /// <param name="orphanCollection">Whether or not the collection will be compacted</param>
-        /// <returns>CreateGraphResult</returns>
-        Task<CreateGraphResult> CreateGraphAsync(string name, List<EdgeDefinitionData> edgeDefinitions, List<string> orphanCollections = null);
+        /// <typeparam name="TVertex">Type of vertex</typeparam>
+        /// <typeparam name="TEdge">Type of edge</typeparam>
+        /// <param name="config">Configuration for the traversal</param>
+        /// <param name="startVertex">Id of the startVertex</param>
+        /// <param name="baseResult"></param>
+        /// <returns>TraversalResult<TVertex, TEdge></returns>
+        TraversalResult<TVertex, TEdge> Traverse<TVertex, TEdge>(TraversalConfig config, string startVertex = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
-        /// Deletes a graph
+        /// Executes a server-side traversal
         /// </summary>
-        /// <param name="name">Name of the graph</param>
-        /// <param name="dropCollections">Drop collections of this graph as well. Collections will only be dropped if they are not used in other graphs.</param>
-        /// <returns></returns>
-        void DeleteGraph(string name, bool dropCollections = false);
+        /// <typeparam name="TVertex">Type of vertex</typeparam>
+        /// <typeparam name="TEdge">Type of edge</typeparam>
+        /// <param name="config">Configuration for the traversal</param>
+        /// <param name="startVertex">Id of the startVertex</param>
+        /// <param name="baseResult"></param>
+        /// <returns>TraversalResult<TVertex, TEdge></returns>
+        Task<TraversalResult<TVertex, TEdge>> TraverseAsync<TVertex, TEdge>(TraversalConfig config, string startVertex = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes a graph

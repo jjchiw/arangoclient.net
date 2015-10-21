@@ -1,4 +1,5 @@
 ﻿using ArangoDB.Client.Http;
+using ArangoDB.Client.Linq;
 using ArangoDB.Client.Property;
 using ArangoDB.Client.Utility;
 using System;
@@ -17,6 +18,7 @@ namespace ArangoDB.Client
     {
         public DatabaseSharedSetting()
         {
+            AqlFunctions = new AqlFunctionCache();
             Cursor = new DatabaseCursorSharedSetting();
             Linq = new DatabaseLinqSharedSetting();
             Document = new DatabaseDocumentSharedSetting();
@@ -27,6 +29,14 @@ namespace ArangoDB.Client
             Credential = new NetworkCredential("root", "");
             SystemDatabaseCredential = new NetworkCredential("root", "");
             ThrowForServerErrors = true;
+            Logger = new DatabaseLogSharedSetting
+            {
+                LogOnlyLightOperations = true,
+                HttpRequest = true,
+                HttpResponse = true,
+                Aql = true,
+                HttpHeaders = false
+            };
         }
 
         private bool _createCollectionOnTheFly;
@@ -34,11 +44,12 @@ namespace ArangoDB.Client
         private string _url;
 
         public string Url
-        { 
-            get { return _url; } 
-            set 
+        {
+            get { return _url; }
+            set
             {
                 _url = new UriBuilder(value).Uri.ToString();
+                HttpConnection.ConfigureServicePoint(_url);
             }
         }
 
@@ -53,7 +64,7 @@ namespace ArangoDB.Client
         public bool ThrowForServerErrors { get; set; }
 
         public bool CreateCollectionOnTheFly
-        { 
+        {
             get
             {
                 return _createCollectionOnTheFly && !ClusterMode;
@@ -67,15 +78,34 @@ namespace ArangoDB.Client
 
         public bool DisableChangeTracking { get; set; }
 
-        public DatabaseCursorSharedSetting Cursor;
+        public DatabaseLogSharedSetting Logger{ get; set; }
 
-        public DatabaseLinqSharedSetting Linq;
+        public DatabaseCursorSharedSetting Cursor { get; set; }
 
-        public DatabaseDocumentSharedSetting Document;
+        public DatabaseLinqSharedSetting Linq { get; set; }
 
-        public DatabaseCollectionSetting Collection;
+        public DatabaseDocumentSharedSetting Document { get; set; }
+
+        public DatabaseCollectionSetting Collection { get; set; }
 
         internal DocumentIdentifierModifier IdentifierModifier;
+
+        internal AqlFunctionCache AqlFunctions { get; set; }
+    }
+
+    public class DatabaseLogSharedSetting
+    {
+        public Action<string> Log { get; set; }
+
+        public bool LogOnlyLightOperations { get; set; }
+
+        public bool Aql { get; set; }
+
+        public bool HttpRequest { get; set; }
+
+        public bool HttpResponse { get; set; }
+
+        public bool HttpHeaders { get; set; }
     }
 
     public class DatabaseLinqSharedSetting
@@ -89,6 +119,7 @@ namespace ArangoDB.Client
         {
             MergeObjectsOnUpdate = true;
             KeepNullAttributesOnUpdate = true;
+            ThrowIfDocumentDoesNotExists = false;
         }
 
         public ReplacePolicy? ReplacePolicy { get; set; }
@@ -96,6 +127,8 @@ namespace ArangoDB.Client
         public bool MergeObjectsOnUpdate { get; set; }
 
         public bool KeepNullAttributesOnUpdate { get; set; }
+
+        public bool ThrowIfDocumentDoesNotExists { get; set; }
     }
 
     public class DatabaseCursorSharedSetting

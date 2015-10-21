@@ -8,17 +8,14 @@ using System.Threading.Tasks;
 namespace ArangoDB.Client.Data
 {
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
-    public class GraphCollectionData
+    public class CreateGraphData
     {
         public string Name { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public List<EdgeDefinitionData> EdgeDefinitions { get; set; }
+        public IList<EdgeDefinitionData> EdgeDefinitions { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public List<string> OrphanCollections { get; set; }
-
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public bool? DropCollections { get; set; }
+        public IList<string> OrphanCollections { get; set; }
     }
 }

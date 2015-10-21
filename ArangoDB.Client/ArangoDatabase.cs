@@ -8,6 +8,7 @@ using ArangoDB.Client.Utility;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -67,7 +68,7 @@ namespace ArangoDB.Client
         {
             action(FindSetting(identifier));
         }
-
+        
         /// <summary>
         /// Change Default Setting
         /// </summary>
@@ -85,7 +86,7 @@ namespace ArangoDB.Client
             if (!cachedSettings.TryGetValue(identifier, out setting))
             {
                 if (throwIfNotFound == true)
-                    throw new InvalidOperationException(string.Format("can not find identifier '{0}'", identifier));
+                    throw new InvalidOperationException(string.Format("Can not find database setting identifier '{0}'", identifier));
 
                 setting = new DatabaseSharedSetting();
                 setting.SettingIdentifier = identifier;
@@ -102,6 +103,16 @@ namespace ArangoDB.Client
         public static IArangoDatabase CreateWithSetting(string identifier)
         {
             return new ArangoDatabase(FindSetting(identifier, true));
+        }
+
+        public void Log(string message)
+        {
+            Setting.Logger.Log?.Invoke(message);
+        }
+
+        public bool LoggerAvailable
+        {
+            get { return Setting.Logger.Log != null; }
         }
 
         /// <summary>
@@ -142,23 +153,25 @@ namespace ArangoDB.Client
             return Query<AQL>();
         }
 
-        public ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null, bool? count = null,
-            int? batchSize = 0, TimeSpan? ttl = null, QueryOption options = null)
+        public ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null,
+           bool ? count = null, int? batchSize = null, TimeSpan? ttl = null, QueryOption options = null)
         {
             QueryData data = new QueryData();
 
             data.Query = query;
 
-            data.BatchSize = Utils.ChangeIfNotSpecified<int>(batchSize, Setting.Cursor.BatchSize);
-            data.Count = Utils.ChangeIfNotSpecified<bool>(count, Setting.Cursor.Count);
+            data.BatchSize = batchSize ?? Setting.Cursor.BatchSize;
+            data.Count = count ?? Setting.Cursor.Count;
 
             if (ttl.HasValue)
                 data.Ttl = ttl.Value.TotalSeconds;
             else if (Setting.Cursor.Ttl.HasValue)
                 data.Ttl = Setting.Cursor.Ttl.Value.TotalSeconds;
 
-            if (bindVars != null)
+            if (bindVars != null && bindVars.Count != 0)
                 data.BindVars = bindVars;
+            else
+                data.BindVars = null;
 
             if (options != null)
                 data.Options = options;
@@ -176,7 +189,66 @@ namespace ArangoDB.Client
                 Command = ""
             };
 
+            if (LoggerAvailable)
+            {
+                Log("==============================");
+                Log(DateTime.Now.ToString());
+                Log($"creating an AQL query:");
+                Log($"query: {data.Query}");
+                if (Setting.Logger.LogOnlyLightOperations == false && data.BindVars != null)
+                {
+                    Log($"bindVars:");
+                    foreach (var b in data.BindVars)
+                        Log($"name: {b.Name} value: {new DocumentSerializer(this).SerializeWithoutReader(b.Value)}");
+                    Log("");
+                    Log("parsed query with variables replaced:");
+                    Log(data.QueryReplacedWithVariables(this));
+                    Log("");
+                }   
+            }
+
             return command.CreateCursor<T>(data);
+        }
+
+        /// <summary>
+        /// Executes a server-side traversal
+        /// </summary>
+        /// <typeparam name="TVertex">Type of vertex</typeparam>
+        /// <typeparam name="TEdge">Type of edge</typeparam>
+        /// <param name="config">Configuration for the traversal</param>
+        /// <param name="startVertex">Id of the startVertex</param>
+        /// <param name="baseResult"></param>
+        /// <returns>TraversalResult<TVertex, TEdge></returns>
+        public TraversalResult<TVertex, TEdge> Traverse<TVertex, TEdge>(TraversalConfig config, string startVertex = null, Action<BaseResult> baseResult = null)
+        {
+            return TraverseAsync<TVertex, TEdge>(config, startVertex, baseResult).ResultSynchronizer();
+        }
+
+        /// <summary>
+        /// Executes a server-side traversal
+        /// </summary>
+        /// <typeparam name="TVertex">Type of vertex</typeparam>
+        /// <typeparam name="TEdge">Type of edge</typeparam>
+        /// <param name="config">Configuration for the traversal</param>
+        /// <param name="startVertex">Id of the startVertex</param>
+        /// <param name="baseResult"></param>
+        /// <returns>TraversalResult<TVertex, TEdge></returns>
+        public async Task<TraversalResult<TVertex, TEdge>> TraverseAsync<TVertex, TEdge>(TraversalConfig config, string startVertex = null, Action<BaseResult> baseResult = null)
+        {
+            var command = new HttpCommand(this)
+            {
+                Api = CommandApi.Traversal,
+                Method = HttpMethod.Post
+            };
+
+            config.StartVertex = startVertex ?? config.StartVertex;
+
+            var result = await command.RequestMergedResult<TraversalContainerResult<TVertex, TEdge>>(config).ConfigureAwait(false);
+
+            if (baseResult != null)
+                baseResult(result.BaseResult);
+
+            return result.Result.Result;
         }
     }
 }

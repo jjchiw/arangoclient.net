@@ -21,10 +21,11 @@ namespace ArangoDB.Client.Http
         Edge = 2,
         Cursor = 3,
         Simple = 4,
-        AllEdges = 5,
-        Collection = 6,
-        Transaction = 7,
-	Graph=8
+        AllEdges=5,
+        Collection=6,
+        Graph=7,
+        Transaction = 8,
+        Traversal = 9
     }
 
     public class HttpCommand
@@ -44,8 +45,9 @@ namespace ArangoDB.Client.Http
                 {CommandApi.Simple,"simple"},
                 {CommandApi.AllEdges,"edges"},
                 {CommandApi.Collection,"collection"},
+                {CommandApi.Graph,"gharial"},
                 {CommandApi.Transaction,"transaction"},
-		{CommandApi.Graph,"gharial"}
+                {CommandApi.Traversal,"traversal"}
             };
         }
 
@@ -87,6 +89,7 @@ namespace ArangoDB.Client.Http
 
 
         // TDeserialize can be : EdgesInheritedCommandResult<List<TResult>>, InheritedCommandResult<List<TResult>>
+        // method should be used when TResult can be change tracked
         public async Task<ICommandResult<List<TResult>>> RequestGenericListResult<TResult, TDeserialize>(object data = null) where TDeserialize : new()
         {
             var response = await SendCommandAsync(data).ConfigureAwait(false);
@@ -118,6 +121,7 @@ namespace ArangoDB.Client.Http
         }
 
         // TDeserialize can be : InheritedCommandResult<TResult>, DocumentInheritedCommandResult<TResult>
+        // method should be used when TResult can be change tracked
         public async Task<ICommandResult<TResult>> RequestGenericSingleResult<TResult, TDeserialize>(object data = null) where TDeserialize : new()
         {
             var response = await SendCommandAsync(data).ConfigureAwait(false);
@@ -146,7 +150,8 @@ namespace ArangoDB.Client.Http
             return result;
         }
 
-        // T can be any type that derived from BaseResult
+        // T can be any type that derived from BaseResult and results are not change tracked
+        // method could be used if we dont want to change track T here
         public async Task<ICommandResult<T>> RequestMergedResult<T>(object data=null)
         {
             DistinctCommandResult<T> result = new DistinctCommandResult<T>();
@@ -169,6 +174,7 @@ namespace ArangoDB.Client.Http
         }
 
         // T can be any type
+        // method should be used when base result is provided on server errors
         public async Task<ICommandResult<T>> RequestDistinctResult<T>(object data = null)
         {
             DistinctCommandResult<T> result = new DistinctCommandResult<T>();

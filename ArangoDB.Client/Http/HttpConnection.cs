@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArangoDB.Client.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,8 @@ namespace ArangoDB.Client.Http
     {
         IArangoDatabase db;
 
-        private static Lazy<HttpClient> httpClientLazily = new Lazy<HttpClient>(() => {
+        private static Lazy<HttpClient> httpClientLazily = new Lazy<HttpClient>(() =>
+        {
             connectionHandler = new HttpConnectionHandler();
             var proxy = ArangoDatabase.ClientSetting.Proxy;
             if (proxy != null)
@@ -34,6 +36,8 @@ namespace ArangoDB.Client.Http
 
             var httpClient = new HttpClient(connectionHandler, true);
             httpClient.DefaultRequestHeaders.ExpectContinue = false;
+            
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NETClient", Utility.Utils.GetAssemblyVersion()));
 
             return httpClient;
         });
@@ -53,20 +57,69 @@ namespace ArangoDB.Client.Http
             this.db = db;
         }
 
-        public async Task<HttpResponseMessage>  SendCommandAsync(HttpMethod method,Uri uri,object data,NetworkCredential credential)
+        internal static void ConfigureServicePoint(string url)
         {
-            var requestMessage = new HttpRequestMessage(method,uri);
+#if !PORTABLE
+            Uri baseUri = new Uri(url);
+            var servicePoint = ArangoDatabase.ClientSetting.Proxy != null ? ServicePointManager.FindServicePoint(baseUri
+                , ArangoDatabase.ClientSetting.Proxy)
+            : ServicePointManager.FindServicePoint(baseUri);
+            servicePoint.UseNagleAlgorithm = false;
+            servicePoint.Expect100Continue = false;
+            servicePoint.ConnectionLimit = 256;
+#endif
+        }
+
+        public async Task<HttpResponseMessage> SendCommandAsync(HttpMethod method, Uri uri, object data, NetworkCredential credential)
+        {
+            var requestMessage = new HttpRequestMessage(method, uri);
 
             string encodedAuthorization = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(credential.UserName + ":" + credential.Password));
             requestMessage.Headers.Add("Authorization", "Basic " + encodedAuthorization);
 
-            if(data!=null)
-                requestMessage.Content = new JsonContent(db,data);
+            if (db.LoggerAvailable)
+            {
+                db.Log("==============================");
+                db.Log(DateTime.Now.ToString());
+                db.Log("sending http request:");
+                db.Log($"url: {uri.ToString()}");
+                db.Log($"method: {method.ToString()}");
+                if(db.Setting.Logger.HttpHeaders)
+                {
+                    db.Log($"headers:");
+                    foreach (var h in requestMessage.Headers)
+                        db.Log($"{h.Key} : {string.Join(" ",h.Value)}");
+                    foreach(var h in httpClient.DefaultRequestHeaders)
+                        db.Log($"{h.Key} : {string.Join(" ", h.Value)}");
+                }
+                if (db.Setting.Logger.LogOnlyLightOperations == false)
+                    db.Log($"data: {new DocumentSerializer(db).SerializeWithoutReader(data)}");
+            }
+
+            if (data != null)
+                requestMessage.Content = new JsonContent(db, data);
 
             var responseMessage = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
 
+            if (db.LoggerAvailable)
+            {
+                db.Log("==============================");
+                db.Log(DateTime.Now.ToString());
+                db.Log("received http response:");
+                db.Log($"url: {uri.ToString()}");
+                db.Log($"status-code: {responseMessage.StatusCode.ToString()}");
+                if (db.Setting.Logger.HttpHeaders)
+                {
+                    db.Log($"headers:");
+                    foreach (var h in responseMessage.Headers)
+                        db.Log($"{h.Key} : {string.Join(" ", h.Value)}");
+                }
+                if (db.Setting.Logger.LogOnlyLightOperations == false)
+                    db.Log($"data: {new DocumentSerializer(db).SerializeWithoutReader(await responseMessage.Content.ReadAsStringAsync())}");
+            }
+
             if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
-                throw new AuthenticationException("The user is not authorized");
+                throw new AuthenticationException($"The user '{credential.UserName}' is not authorized");
 
             return responseMessage;
         }

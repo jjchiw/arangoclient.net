@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using ArangoDB.Client.Utility;
+using ArangoDB.Client.Graph;
 
 namespace ArangoDB.Client
 {
@@ -213,6 +214,42 @@ namespace ArangoDB.Client
         }
 
         /// <summary>
+        /// List of collections
+        /// </summary>
+        /// <param name="excludeSystem">Exclude system collections</param>
+        /// <param name="baseResult">Runs when base result is ready</param>
+        /// <returns>List of collection properties</returns>
+        public List<CreateCollectionResult> ListCollections(bool excludeSystem = true, Action<BaseResult> baseResult = null)
+        {
+            return ListCollectionsAsync(excludeSystem, baseResult).ResultSynchronizer();
+        }
+
+        /// <summary>
+        /// List of collections
+        /// </summary>
+        /// <param name="excludeSystem">Exclude system collections</param>
+        /// <param name="baseResult">Runs when base result is ready</param>
+        /// <returns>List of collection properties</returns>
+        public async Task<List<CreateCollectionResult>> ListCollectionsAsync(bool excludeSystem=true, Action<BaseResult> baseResult = null)
+        {
+            var command = new HttpCommand(this)
+            {
+                Api = CommandApi.Collection,
+                Method = HttpMethod.Get,
+                Query = new Dictionary<string, string>()
+            };
+
+            command.Query.Add("excludeSystem", excludeSystem.ToString());
+
+            var result = await command.RequestGenericListResult<CreateCollectionResult, CollectionsInheritedCommandResult<List<CreateCollectionResult>>>().ConfigureAwait(false);
+
+            if (baseResult != null)
+                baseResult(result.BaseResult);
+
+            return result.Result;
+        }
+
+        /// <summary>
         /// Deletes a database
         /// </summary>
         /// <param name="name">Name of the database</param>
@@ -277,7 +314,48 @@ namespace ArangoDB.Client
             return result.Result;
         }
 
-        /// List of collections name
+        /// <summary>
+        /// Graph methods container
+        /// </summary>
+        /// <param name="graphName">The name of the graph</param>
+        /// <returns></returns>
+        public IArangoGraph Graph(string graphName)
+        {
+            return new ArangoGraph(this, graphName);
+        }
+
+        /// <summary>
+        /// Lists all graphs
+        /// </summary>
+        /// <param name="baseResult"></param>
+        /// <returns>List<GraphIdentifierResult></returns>
+        public List<GraphIdentifierResult> ListGraphs(Action<BaseResult> baseResult = null)
+        {
+            return ListGraphsAsync(baseResult).ResultSynchronizer();
+        }
+
+        /// <summary>
+        /// Lists all graphs
+        /// </summary>
+        /// <param name="baseResult"></param>
+        /// <returns>List<GraphIdentifierResult></returns>
+        public async Task<List<GraphIdentifierResult>> ListGraphsAsync(Action<BaseResult> baseResult = null)
+        {
+            var command = new HttpCommand(this)
+            {
+                Api = CommandApi.Graph,
+                Method = HttpMethod.Get
+            };
+
+            var result = await command.RequestMergedResult<GraphListResult>().ConfigureAwait(false);
+
+            if (baseResult != null)
+                baseResult(result.BaseResult);
+
+            return result.Result.Graphs;
+        }
+
+	/// List of collections name
         /// </summary>
         /// <returns>List of collections names</returns>
         public List<CollectionData> ListCollections()
