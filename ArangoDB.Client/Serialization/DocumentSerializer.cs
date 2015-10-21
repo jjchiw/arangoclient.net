@@ -14,6 +14,9 @@ namespace ArangoDB.Client.Serialization
     public class DocumentSerializer
     {
         IArangoDatabase db;
+
+        public static Func<IArangoDatabase, JsonSerializer> CustomJsonSerializer;
+
         public DocumentSerializer(IArangoDatabase db)
         {
             this.db = db;
@@ -75,18 +78,23 @@ namespace ArangoDB.Client.Serialization
 
         public JsonSerializer CreateJsonSerializer()
         {
-            var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings 
-            { 
-                ContractResolver = new DocumentContractResolver(db),
-                Converters = new JsonConverter[] 
+            if (CustomJsonSerializer == null)
+            {
+                return JsonSerializer.Create(new JsonSerializerSettings
                 {
-                    new DateTimeConverter(),
-                    new QueryParameterConverter()
-                },
-                DateParseHandling = DateParseHandling.None
-            });
+                    ContractResolver = new DocumentContractResolver(db),
+                    Converters = new JsonConverter[]
+                    {
+                        new DateTimeConverter(),
+                        new QueryParameterConverter()
+                    },
+                    DateParseHandling = DateParseHandling.None
+                });
+            }
 
-            return jsonSerializer;
+            return CustomJsonSerializer(db);
+            
+
         }
     }
 }
