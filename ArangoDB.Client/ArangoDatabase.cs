@@ -153,13 +153,13 @@ namespace ArangoDB.Client
             return Query<AQL>();
         }
 
-        public ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null,
-           bool ? count = null, int? batchSize = null, TimeSpan? ttl = null, QueryOption options = null)
+        public ICursor<T> CreateStatement<T>(string query, IList<QueryParameter> bindVars = null, bool? count = null,
+            int? batchSize = null, TimeSpan? ttl = null, QueryOption options = null)
         {
             QueryData data = new QueryData();
 
             data.Query = query;
-
+            
             data.BatchSize = batchSize ?? Setting.Cursor.BatchSize;
             data.Count = count ?? Setting.Cursor.Count;
 
