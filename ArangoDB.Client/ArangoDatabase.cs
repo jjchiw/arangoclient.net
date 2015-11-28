@@ -157,8 +157,10 @@ namespace ArangoDB.Client
             else if (Setting.Cursor.Ttl.HasValue)
                 data.Ttl = Setting.Cursor.Ttl.Value.TotalSeconds;
 
-            if (bindVars != null)
+            if (bindVars != null && bindVars.Count != 0)
                 data.BindVars = bindVars;
+            else
+                data.BindVars = null;
 
             if (options != null)
                 data.Options = options;
