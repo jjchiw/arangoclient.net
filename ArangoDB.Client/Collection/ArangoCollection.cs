@@ -38,9 +38,9 @@ namespace ArangoDB.Client.Collection
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        public IDocumentIdentifierResult Insert(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        public IDocumentIdentifierResult Insert(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
-            return InsertAsync(document, createCollection, waitForSync, baseResult).ResultSynchronizer();
+            return InsertAsync(document, createCollection, waitForSync, baseResult, evt).ResultSynchronizer();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        public async Task<IDocumentIdentifierResult> InsertAsync(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        public async Task<IDocumentIdentifierResult> InsertAsync(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             createCollection = createCollection ?? db.Setting.CreateCollectionOnTheFly;
             waitForSync = waitForSync ?? db.Setting.WaitForSync;
@@ -106,7 +106,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
         public async Task<IDocumentIdentifierResult> InsertEdgeAsync(string from, string to, object edgeDocument,
-            bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+            bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             createCollection = createCollection ?? db.Setting.CreateCollectionOnTheFly;
             waitForSync = waitForSync ?? db.Setting.WaitForSync;
@@ -171,7 +171,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
         public async Task<IDocumentIdentifierResult> ReplaceByIdAsync(string id, object document, string rev = null,
-            ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+            ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             string apiCommand = id.IndexOf("/") == -1 ? string.Format("{0}/{1}", collectionName, id) : id;
 
@@ -225,7 +225,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        public async Task<IDocumentIdentifierResult> ReplaceAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        public async Task<IDocumentIdentifierResult> ReplaceAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             if (db.Setting.DisableChangeTracking == true)
                 throw new InvalidOperationException("Change tracking is disabled, use ReplaceById() instead");
@@ -280,7 +280,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
         public async Task<IDocumentIdentifierResult> UpdateByIdAsync(string id, object document, bool? keepNull = null,
-            bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+            bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             string apiCommand = id.IndexOf("/") == -1 ? string.Format("{0}/{1}", collectionName, id) : id;
 
@@ -338,7 +338,7 @@ namespace ArangoDB.Client.Collection
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
         public async Task<IDocumentIdentifierResult> UpdateAsync(object document, bool? keepNull = null,
-            bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+            bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             if (db.Setting.DisableChangeTracking == true)
                 throw new InvalidOperationException("Change tracking is disabled, use UpdateById() instead");
@@ -417,7 +417,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
         public async Task<IDocumentIdentifierResult> RemoveByIdAsync(string id, string rev = null, ReplacePolicy? policy = null,
-            bool? waitForSync = null, Action<BaseResult> baseResult = null)
+            bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             string apiCommand = id.IndexOf("/") == -1 ? string.Format("{0}/{1}", collectionName, id) : id;
 
@@ -466,7 +466,7 @@ namespace ArangoDB.Client.Collection
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
         public async Task<IDocumentIdentifierResult> RemoveAsync(object document, ReplacePolicy? policy = null,
-            bool? waitForSync = null, Action<BaseResult> baseResult = null)
+            bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
             if (db.Setting.DisableChangeTracking == true)
                 throw new InvalidOperationException("Change tracking is disabled, use RemoveById() instead");

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ArangoDB.Client
@@ -39,7 +38,7 @@ namespace ArangoDB.Client
         void Log(string message);
 
         bool LoggerAvailable { get; }
-        
+
         /// <summary>
         /// Get Document JsonObject and Identifiers
         /// </summary>
@@ -92,7 +91,7 @@ namespace ArangoDB.Client
         /// <param name="createCollection">If true, then the collection is created if it does not yet exist</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<IDocumentIdentifierResult> InsertEdgeAsync<T,TFrom, TTo>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> InsertEdgeAsync<T, TFrom, TTo>(string from, string to, object edgeDocument, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Completely updates the document
@@ -125,7 +124,7 @@ namespace ArangoDB.Client
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
         IDocumentIdentifierResult ReplaceById<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-        
+
         /// <summary>
         /// Completely updates the document with no change tracking
         /// </summary>
@@ -136,7 +135,7 @@ namespace ArangoDB.Client
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
         Task<IDocumentIdentifierResult> ReplaceByIdAsync<T>(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-        
+
         ///<summary>
         ///Partially updates the document without change tracking
         ///</summary>
@@ -149,7 +148,7 @@ namespace ArangoDB.Client
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
         IDocumentIdentifierResult UpdateById<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-        
+
         ///<summary>
         ///Partially updates the document without change tracking
         ///</summary>
@@ -222,7 +221,7 @@ namespace ArangoDB.Client
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
         Task<IDocumentIdentifierResult> RemoveAsync<T>(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
-        
+
         /// <summary>
         /// Reads a single document
         /// </summary>
@@ -480,7 +479,7 @@ namespace ArangoDB.Client
         /// <returns>Returns a cursor</returns>
         ICursor<T> Within<T>(double latitude, double longitude, double radius, Expression<Func<T, object>> distance = null, string geo = null
             , int? skip = null, int? limit = null, int? batchSize = null);
-        
+
         /// <summary>
         /// Finds all documents from the collection that match the fulltext query
         /// </summary>
@@ -534,7 +533,7 @@ namespace ArangoDB.Client
         /// <param name="edgeDefinitions">If true then the data is synchronised to disk before returning from a document create, update, replace or removal operation</param>
         /// <param name="orphanCollection">Whether or not the collection will be compacted</param>
         /// <returns>CreateGraphResult</returns>
-        CreateGraphResult CreateGraph(string name, List<EdgeDefinitionData> edgeDefinitions, List<string> orphanCollections = null);
+        GraphResult CreateGraph(string name, List<EdgeDefinitionData> edgeDefinitions, List<string> orphanCollections = null);
 
         /// <summary>
         /// Executes a server-side traversal
@@ -587,7 +586,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        DocumentIdentifierResult RemoveEdge<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        IDocumentIdentifierResult RemoveEdge<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes the edge
@@ -596,7 +595,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until edge has been synced to disk</param>
         /// <returns></returns>
-        Task<DocumentIdentifierResult> RemoveEdgeAsync<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> RemoveEdgeAsync<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
         /// Deletes the edge without change tracking
@@ -606,7 +605,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until edge has been synced to disk</param>
         /// <returns></returns>
-        DocumentIdentifierResult RemoveEdgeById<T>(string id, string rev = null, ReplacePolicy? policy = null,
+        IDocumentIdentifierResult RemoveEdgeById<T>(string id, string rev = null, ReplacePolicy? policy = null,
             bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>
@@ -617,7 +616,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until edge has been synced to disk</param>
         /// <returns></returns>
-        Task<DocumentIdentifierResult> RemoveEdgeByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null,
+        Task<IDocumentIdentifierResult> RemoveEdgeByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null,
             bool? waitForSync = null, Action<BaseResult> baseResult = null);
 
         /// <summary>

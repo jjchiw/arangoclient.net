@@ -1,9 +1,6 @@
 ﻿using ArangoDB.Client.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ArangoDB.Client
@@ -86,7 +83,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<IDocumentIdentifierResult> ReplaceAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> ReplaceAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Completely updates the document with no change tracking
@@ -108,7 +105,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<IDocumentIdentifierResult> ReplaceByIdAsync(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> ReplaceByIdAsync(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         ///<summary>
         ///Partially updates the document without change tracking
@@ -134,7 +131,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        Task<IDocumentIdentifierResult> UpdateByIdAsync(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> UpdateByIdAsync(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         ///<summary>
         ///Partially updates the document
@@ -157,7 +154,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        Task<IDocumentIdentifierResult> UpdateAsync(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> UpdateAsync(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -177,7 +174,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        Task<IDocumentIdentifierResult> RemoveByIdAsync(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> RemoveByIdAsync(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -195,7 +192,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        Task<IDocumentIdentifierResult> RemoveAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null);
+        Task<IDocumentIdentifierResult> RemoveAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Finds all documents matching a given example
@@ -341,7 +338,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        DocumentIdentifierResult Replace(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        IDocumentIdentifierResult Replace(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Completely updates the document
@@ -352,7 +349,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> ReplaceAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        Task<IDocumentIdentifierResult> ReplaceAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Completely updates the document with no change tracking
@@ -363,7 +360,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        DocumentIdentifierResult ReplaceById(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        IDocumentIdentifierResult ReplaceById(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Completely updates the document with no change tracking
@@ -374,7 +371,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> ReplaceByIdAsync(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        Task<IDocumentIdentifierResult> ReplaceByIdAsync(string id, object document, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         ///<summary>
         ///Partially updates the document without change tracking
@@ -387,7 +384,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        DocumentIdentifierResult UpdateById(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        IDocumentIdentifierResult UpdateById(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         ///<summary>
         ///Partially updates the document without change tracking
@@ -400,7 +397,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> UpdateByIdAsync(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        Task<IDocumentIdentifierResult> UpdateByIdAsync(string id, object document, bool? keepNull = null, bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         ///<summary>
         ///Partially updates the document
@@ -411,7 +408,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        DocumentIdentifierResult Update(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        IDocumentIdentifierResult Update(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
 
         ///<summary>
@@ -423,7 +420,7 @@ namespace ArangoDB.Client
         ///<param name="policy">To control the update behavior in case there is a revision mismatch</param>
         ///<param name="waitForSync">Wait until document has been synced to disk</param>
         ///<returns>Document identifiers</returns>
-        Task<DocumentIdentifierResult> UpdateAsync(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        Task<IDocumentIdentifierResult> UpdateAsync(object document, bool? keepNull = null, bool? mergeObjects = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -433,7 +430,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        DocumentIdentifierResult RemoveById(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        IDocumentIdentifierResult RemoveById(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -443,7 +440,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        Task<DocumentIdentifierResult> RemoveByIdAsync(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        Task<IDocumentIdentifierResult> RemoveByIdAsync(string id, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Deletes the document without change tracking
@@ -452,7 +449,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        DocumentIdentifierResult Remove(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        IDocumentIdentifierResult Remove(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Deletes the document
@@ -461,7 +458,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        Task<DocumentIdentifierResult> RemoveAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
+        Task<IDocumentIdentifierResult> RemoveAsync(object document, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null);
 
         /// <summary>
         /// Finds all documents matching a given example
@@ -552,7 +549,7 @@ namespace ArangoDB.Client
         /// <param name="limit">The maximal amount of documents to return. The skip is applied before the limit restriction</param>
         /// <param name="batchSize">Limits the number of results to be transferred in one batch</param>
         /// <returns>Returns a cursor</returns>
-        ICursor<T> Fulltext(Expression<Func<T, object>> attribute, string query, string index=null
+        ICursor<T> Fulltext(Expression<Func<T, object>> attribute, string query, string index = null
             , int? skip = null, int? limit = null, int? batchSize = null);
     }
 }

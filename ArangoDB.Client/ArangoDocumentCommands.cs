@@ -2,9 +2,7 @@
 using ArangoDB.Client.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ArangoDB.Client
@@ -17,7 +15,7 @@ namespace ArangoDB.Client
         /// <returns></returns>
         public IDocumentCollection<T> Collection<T>()
         {
-            return new ArangoCollection<T>(this,CollectionType.Document);
+            return new ArangoCollection<T>(this, CollectionType.Document);
         }
 
         /// <summary>
@@ -83,7 +81,7 @@ namespace ArangoDB.Client
         public IDocumentIdentifierResult InsertEdge<T, TFrom, TTo>(string from, string to, object edgeDocument, bool? createCollection = null,
             bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
-            return EdgeCollection<T>().InsertEdge(from, to, edgeDocument, createCollection, waitForSync, baseResult, BeforeItemInserted);
+            return EdgeCollection<T>().InsertEdge<TFrom, TTo>(from, to, edgeDocument, createCollection, waitForSync, baseResult, BeforeItemInserted);
         }
 
         /// <summary>
@@ -98,7 +96,7 @@ namespace ArangoDB.Client
         public async Task<IDocumentIdentifierResult> InsertEdgeAsync<T, TFrom, TTo>(string from, string to, object edgeDocument,
             bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
-            return await EdgeCollection<T>().InsertEdgeAsync(from, to, edgeDocument, createCollection, waitForSync, baseResult, BeforeItemInserted).ConfigureAwait(false);
+            return await EdgeCollection<T>().InsertEdgeAsync<TFrom, TTo>(from, to, edgeDocument, createCollection, waitForSync, baseResult, BeforeItemInserted).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -212,7 +210,7 @@ namespace ArangoDB.Client
         public async Task<IDocumentIdentifierResult> UpdateByIdAsync<T>(string id, object document, bool? keepNull = null, bool? mergeObjects = null,
             string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
-            return await Collection<T>().UpdateByIdAsync(id, document,keepNull,mergeObjects, rev, policy, waitForSync, baseResult, BeforeItemUpdated).ConfigureAwait(false);
+            return await Collection<T>().UpdateByIdAsync(id, document, keepNull, mergeObjects, rev, policy, waitForSync, baseResult, BeforeItemUpdated).ConfigureAwait(false);
         }
 
         ///<summary>
@@ -227,7 +225,7 @@ namespace ArangoDB.Client
         public IDocumentIdentifierResult Update<T>(object document, bool? keepNull = null, bool? mergeObjects = null,
             ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
-            return Collection<T>().Update(document, keepNull, mergeObjects, policy, waitForSync,baseResult, BeforeItemUpdated);
+            return Collection<T>().Update(document, keepNull, mergeObjects, policy, waitForSync, baseResult, BeforeItemUpdated);
         }
 
         ///<summary>
@@ -466,7 +464,7 @@ namespace ArangoDB.Client
         /// <param name="limit">The maximal amount of documents to return. The skip is applied before the limit restriction</param>
         /// <param name="batchSize">Limits the number of results to be transferred in one batch</param>
         /// <returns>Returns a cursor</returns>
-        public ICursor<T> Fulltext<T>(Expression<Func<T, object>> attribute, string query, string index=null
+        public ICursor<T> Fulltext<T>(Expression<Func<T, object>> attribute, string query, string index = null
             , int? skip = null, int? limit = null, int? batchSize = null)
         {
             return Collection<T>().Fulltext(attribute, query, index, skip, limit, batchSize);
@@ -479,7 +477,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until document has been synced to disk</param>
         /// <returns></returns>
-        public DocumentIdentifierResult RemoveEdge<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        public IDocumentIdentifierResult RemoveEdge<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
             return EdgeCollection<T>().Remove(edge, policy, waitForSync, baseResult);
         }
@@ -491,7 +489,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until edge has been synced to disk</param>
         /// <returns></returns>
-        public async Task<DocumentIdentifierResult> RemoveEdgeAsync<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
+        public async Task<IDocumentIdentifierResult> RemoveEdgeAsync<T>(object edge, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
             return await EdgeCollection<T>().RemoveAsync(edge, policy, waitForSync, baseResult).ConfigureAwait(false);
         }
@@ -504,7 +502,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until edge has been synced to disk</param>
         /// <returns></returns>
-        public DocumentIdentifierResult RemoveEdgeById<T>(string id, string rev = null, ReplacePolicy? policy = null,
+        public IDocumentIdentifierResult RemoveEdgeById<T>(string id, string rev = null, ReplacePolicy? policy = null,
             bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
             return EdgeCollection<T>().RemoveById(id, rev, policy, waitForSync, baseResult);
@@ -518,7 +516,7 @@ namespace ArangoDB.Client
         /// <param name="policy">To control the update behavior in case there is a revision mismatch</param>
         /// <param name="waitForSync">Wait until edge has been synced to disk</param>
         /// <returns></returns>
-        public async Task<DocumentIdentifierResult> RemoveEdgeByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null,
+        public async Task<IDocumentIdentifierResult> RemoveEdgeByIdAsync<T>(string id, string rev = null, ReplacePolicy? policy = null,
             bool? waitForSync = null, Action<BaseResult> baseResult = null)
         {
             return await EdgeCollection<T>().RemoveByIdAsync(id, rev, policy, waitForSync, baseResult).ConfigureAwait(false);
