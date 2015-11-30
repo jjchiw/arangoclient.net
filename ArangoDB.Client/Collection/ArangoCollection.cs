@@ -52,6 +52,8 @@ namespace ArangoDB.Client.Collection
         /// <returns>Document identifiers</returns>
         public async Task<IDocumentIdentifierResult> InsertAsync(object document, bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
+            Fire(evt, document);
+
             createCollection = createCollection ?? db.Setting.CreateCollectionOnTheFly;
             waitForSync = waitForSync ?? db.Setting.WaitForSync;
 
@@ -108,6 +110,8 @@ namespace ArangoDB.Client.Collection
         public async Task<IDocumentIdentifierResult> InsertEdgeAsync(string from, string to, object edgeDocument,
             bool? createCollection = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
+            Fire(evt, edgeDocument);
+
             createCollection = createCollection ?? db.Setting.CreateCollectionOnTheFly;
             waitForSync = waitForSync ?? db.Setting.WaitForSync;
 
@@ -173,6 +177,9 @@ namespace ArangoDB.Client.Collection
         public async Task<IDocumentIdentifierResult> ReplaceByIdAsync(string id, object document, string rev = null,
             ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
+
+            Fire(evt, document);
+
             string apiCommand = id.IndexOf("/") == -1 ? string.Format("{0}/{1}", collectionName, id) : id;
 
             policy = policy ?? db.Setting.Document.ReplacePolicy;
@@ -230,6 +237,8 @@ namespace ArangoDB.Client.Collection
             if (db.Setting.DisableChangeTracking == true)
                 throw new InvalidOperationException("Change tracking is disabled, use ReplaceById() instead");
 
+            Fire(evt, document);
+
             var container = db.ChangeTracker.FindDocumentInfo(document);
             policy = policy ?? db.Setting.Document.ReplacePolicy;
             string rev = policy.HasValue && policy.Value == ReplacePolicy.Error ? container.Rev : null;
@@ -282,6 +291,8 @@ namespace ArangoDB.Client.Collection
         public async Task<IDocumentIdentifierResult> UpdateByIdAsync(string id, object document, bool? keepNull = null,
             bool? mergeObjects = null, string rev = null, ReplacePolicy? policy = null, bool? waitForSync = null, Action<BaseResult> baseResult = null, EventHandler<ArangoDatabaseEventArgs> evt = null)
         {
+            Fire(evt, document);
+
             string apiCommand = id.IndexOf("/") == -1 ? string.Format("{0}/{1}", collectionName, id) : id;
 
             keepNull = keepNull ?? db.Setting.Document.KeepNullAttributesOnUpdate;
@@ -343,6 +354,7 @@ namespace ArangoDB.Client.Collection
             if (db.Setting.DisableChangeTracking == true)
                 throw new InvalidOperationException("Change tracking is disabled, use UpdateById() instead");
 
+            Fire(evt, document);
 
             DocumentContainer container = null;
             JObject jObject = null;
@@ -925,6 +937,15 @@ namespace ArangoDB.Client.Collection
                 baseResult(result.BaseResult);
 
             return result.Result;
+        }
+
+        private void Fire(EventHandler<ArangoDatabaseEventArgs> @event, object item)
+        {
+            if (@event != null)
+            {
+                var args = new ArangoDatabaseEventArgs { Item = item, Type = item.GetType() };
+                @event(this, args);
+            }
         }
     }
 

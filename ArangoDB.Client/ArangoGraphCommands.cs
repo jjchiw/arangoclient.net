@@ -36,7 +36,7 @@ namespace ArangoDB.Client
                 Method = HttpMethod.Post
             };
 
-            var data = new GraphCollectionData
+            var data = new CreateGraphData
             {
                 Name = name,
                 EdgeDefinitions = edgeDefinitions,
@@ -74,10 +74,10 @@ namespace ArangoDB.Client
                 Command = name
             };
 
-            var data = new GraphCollectionData
+            var data = new DropGraphCollectionData
             {
                 Name = name,
-                DropCollections = dropCollections
+                DropCollection = dropCollections
             };
 
             var result = await command.RequestGenericSingleResult<bool, InheritedCommandResult<bool>>(data).ConfigureAwait(false);
@@ -107,7 +107,7 @@ namespace ArangoDB.Client
                 Command = name
             };
 
-            var result = await command.RequestMergedResult<CreateGraphResult>().ConfigureAwait(false);
+            var result = await command.RequestMergedResult<GraphResult>().ConfigureAwait(false);
 
             return result.Result.Graph;
         }
